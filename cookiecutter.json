@@ -1,0 +1,20 @@
+{
+  "author_names": "Simon Billinge",
+  "author_emails": "sbillinge@ucsb.edu",
+  "maintainer_names": "Simon Billinge",
+  "maintainer_emails": "sbillinge@ucsb.edu",
+  "maintainer_github_usernames": "sbillinge",
+  "contributors": "Members of the diffpy community",
+  "project_name": "diffpy.cmistructure",
+  "license_holders": "Contributors to diffpy.cmistructure",
+  "github_username_or_orgname": "diffpy",
+  "github_repo_name": "diffpy.cmistructure",
+  "conda_pypi_package_dist_name": "diffpy.cmistructure",
+  "package_dir_name": "diffpy.cmistructure",
+  "project_short_description": "diffpy.cmi package for doing refinements with structure objects",
+  "project_keywords": "diffraction, PDF, X-ray, neutron",
+  "minimum_supported_python_version": "3.12",
+  "maximum_supported_python_version": "3.14",
+  "project_needs_c_code_compiled": "No",
+  "project_has_gui_tests": "No"
+}
