@@ -32,33 +32,66 @@ class BaseStructureParSet(ParameterSet):
 
     Attributes
     ----------
-    stru
-        The adapted object
+    stru : object
+        The adapted structure object.
     """
 
     @classmethod
-    def canAdapt(self, stru):
-        """Return whether the structure can be adapted by this class."""
+    def can_adapt(self, stru):
+        """Return whether the structure can be adapted by this class.
+
+        Parameters
+        ----------
+        stru : object
+            The structure object to check.
+
+        Returns
+        -------
+        bool
+            The flag indicating if `stru` can be adapted. The base class
+            always returns False.
+        """
         return False
 
-    def getLattice(self):
-        """Get a ParameterSet containing the lattice Parameters.
+    def get_lattice(self):
+        """Return the ParameterSet containing the lattice Parameters.
 
         The returned ParameterSet may contain other Parameters than the
         lattice Parameters. It is assumed that the lattice parameters
         are named "a", "b", "c", "alpha", "beta", "gamma".
 
-        Lattice must also have the "angunits" attribute, which is either
-        "deg" or "rad", to signify degrees or radians.
+        The lattice must also have the "angunits" attribute, which is
+        either "deg" or "rad", to signify degrees or radians.
+
+        Returns
+        -------
+        ParameterSet
+            The ParameterSet holding the lattice Parameters.
+
+        Raises
+        ------
+        NotImplementedError
+            If the subclass does not override this method.
         """
         raise NotImplementedError("The must be overloaded")
 
-    def getScatterers(self):
-        """Get a list of ParameterSets that represents the scatterers.
+    def get_scatterers(self):
+        """Return the list of ParameterSets that represent the
+        scatterers.
 
         The site positions must be accessible from the list entries via
         the names "x", "y", and "z". The ADPs must be accessible as
         well, but the name and nature of the ADPs (U-factors, B-factors,
         isotropic, anisotropic) depends on the adapted structure.
+
+        Returns
+        -------
+        list of ParameterSet
+            The ParameterSets of the scatterers in the structure.
+
+        Raises
+        ------
+        NotImplementedError
+            If the subclass does not override this method.
         """
         raise NotImplementedError("The must be overloaded")

@@ -21,42 +21,51 @@ from diffpy.cmistructure.sgconstraints import constrain_as_space_group
 # package version
 from diffpy.cmistructure.version import __version__  # noqa
 
-__all__ = ["constrain_as_space_group", "struToParameterSet"]
+__all__ = ["constrain_as_space_group", "stru_to_parameter_set"]
 
 
-def struToParameterSet(name, stru):
-    """Creates a ParameterSet from an structure.
+def stru_to_parameter_set(name, stru):
+    """Create a ParameterSet adapted to a structure object.
 
-    This returns a ParameterSet adapted for the structure depending on its
-    type.
+    The adapter is chosen from the type of `stru`. Supported types are
+    diffpy.structure.Structure, pyobjcryst.crystal.Crystal,
+    pyobjcryst.molecule.Molecule and cctbx.crystal.special_position_settings.
 
     Parameters
     ----------
-    stru
-        a structure object known by this module
-    name
-        A name to give the structure.
+    name : str
+        The name to give the structure.
+    stru : object
+        The structure object to adapt.
 
-    Raises TypeError if stru cannot be adapted
+    Returns
+    -------
+    BaseStructureParSet
+        The ParameterSet adapting `stru`.
+
+    Raises
+    ------
+    TypeError
+        If `stru` is not one of the supported structure types.
     """
     from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
 
-    if DiffpyStructureParSet.canAdapt(stru):
+    if DiffpyStructureParSet.can_adapt(stru):
         return DiffpyStructureParSet(name, stru)
 
     from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
 
-    if ObjCrystCrystalParSet.canAdapt(stru):
+    if ObjCrystCrystalParSet.can_adapt(stru):
         return ObjCrystCrystalParSet(name, stru)
 
     from diffpy.cmistructure.objcrystparset import ObjCrystMoleculeParSet
 
-    if ObjCrystMoleculeParSet.canAdapt(stru):
+    if ObjCrystMoleculeParSet.can_adapt(stru):
         return ObjCrystMoleculeParSet(name, stru)
 
     from diffpy.cmistructure.cctbxparset import CCTBXCrystalParSet
 
-    if CCTBXCrystalParSet.canAdapt(stru):
+    if CCTBXCrystalParSet.can_adapt(stru):
         return CCTBXCrystalParSet(name, stru)
 
     raise TypeError("Unadaptable structure format")

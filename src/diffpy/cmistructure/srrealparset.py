@@ -28,12 +28,11 @@ class SrRealParSet(BaseStructureParSet):
 
     Attributes
     ----------
-    stru
-        The adapted object
-    _usesymmetry
-        A flag indicating if SrReal calculators that operate on
-        this object should use symmetry. By default this is
-        True.
+    stru : object
+        The adapted structure object.
+    _usesymmetry : bool
+        The flag indicating if SrReal calculators that operate on
+        this object should use symmetry (default True).
     """
 
     def __init__(self, *args, **kw):
@@ -42,26 +41,29 @@ class SrRealParSet(BaseStructureParSet):
         self.stru = None
         return
 
-    def restrainBVS(self, sig=1, scaled=False):
+    def restrain_bvs(self, sig=1, scaled=False):
         """Restrain the bond-valence sum to zero.
 
         This adds a penalty to the cost function equal to
-        bvmsdiff / sig**2
-        where bvmsdiff is the mean-squared difference between the calculated
-        and expected bond valence sums for the structure. If scaled is True,
-        this is also scaled by the current point-averaged chi^2 value so the
-        restraint is roughly equally weighted in the fit.
+        ``bvmsdiff / sig**2``, where ``bvmsdiff`` is the mean-squared
+        difference between the calculated and expected bond valence sums
+        for the structure. If `scaled` is True, this is also scaled by the
+        current point-averaged chi^2 value so the restraint is roughly
+        equally weighted in the fit.
 
         Parameters
         ----------
-        sig
+        sig : float, optional
             The uncertainty on the BVS (default 1).
-        scaled
-            A flag indicating if the restraint is scaled
-            (multiplied) by the unrestrained point-average chi^2
-            (chi^2/numpoints) (default False).
+        scaled : bool, optional
+            The flag indicating if the restraint is scaled (multiplied)
+            by the unrestrained point-average chi^2 (chi^2/numpoints)
+            (default False).
 
-        Returns the BVSRestraint object for use with the 'unrestrain' method.
+        Returns
+        -------
+        BVSRestraint
+            The restraint object, for use with the ``unrestrain`` method.
         """
         # Create the Restraint object
         res = BVSRestraint(self, sig, scaled)
@@ -72,17 +74,28 @@ class SrRealParSet(BaseStructureParSet):
         # Return the Restraint object
         return res
 
-    def useSymmetry(self, use=True):
-        """Set this structure to use symmetry.
+    def use_symmetry(self, use=True):
+        """Set whether this structure uses symmetry.
 
         This determines how the structure is treated by SrReal
         calculators.
+
+        Parameters
+        ----------
+        use : bool, optional
+            The flag indicating if symmetry is used (default True).
         """
         self._usesymmetry = bool(use)
         return
 
-    def usingSymmetry(self):
-        """Check if symmetry is being used."""
+    def using_symmetry(self):
+        """Return whether symmetry is being used.
+
+        Returns
+        -------
+        bool
+            The flag indicating if symmetry is used.
+        """
         return self._usesymmetry
 
     def _get_srreal_structure(self):

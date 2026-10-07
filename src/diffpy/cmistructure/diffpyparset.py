@@ -57,46 +57,46 @@ class _xyzsetter(object):
 
 
 class DiffpyAtomParSet(ParameterSet):
-    """A wrapper for diffpy.structure.Atom.
+    """Adapt a diffpy.structure.Atom to the ParameterSet interface.
 
-    This class derives from diffpy.srfit.fitbase.parameterset.ParameterSet. See
-    this class for base attributes.
+    This class derives from diffpy.srfit.fitbase.parameterset.ParameterSet.
+    See that class for base attributes.
 
     Attributes
     ----------
-    atom
-        The diffpy.structure.Atom this is adapting
-    element
+    atom : diffpy.structure.Atom
+        The atom this is adapting.
+    element : str
         The element name (property).
-
-    Managed Parameters
-    ------------------
-    occupancy
-        Occupancy of the atom on its crystal location
-        (ParameterAdapter)
-    occ
-        Proxy for occupancy (ParameterProxy).
-        U11, U22, U33, U12, U21, U23, U32, U13, U31
-        --  Anisotropic displacement factor for atom (ParameterAdapter
-        or ParameterProxy). Note that the Uij and Uji parameters
-        are the same.
-    Uiso
-        Isotropic ADP (ParameterAdapter).
-        B11, B22, B33, B12, B21, B23, B32, B13, B31
-        --  Anisotropic displacement factor for atom (ParameterAdapter
-        or ParameterProxy). Note that the Bij and Bji parameters
-        are the same. (Bij = 8*pi**2*Uij)
-    Biso
-        Isotropic ADP (ParameterAdapter).
+    x, y, z : ParameterAdapter
+        The fractional coordinates of the atom.
+    occupancy : ParameterAdapter
+        The occupancy of the atom on its crystal location.
+    occ : ParameterProxy
+        The proxy for `occupancy`.
+    Uij : ParameterAdapter or ParameterProxy
+        The anisotropic displacement factors U11, U22, U33, U12, U21, U13,
+        U31, U23 and U32 of the atom. The Uij and Uji parameters are the
+        same.
+    Uiso : ParameterAdapter
+        The isotropic displacement factor of the atom.
+    Bij : ParameterAdapter or ParameterProxy
+        The anisotropic displacement factors B11, B22, B33, B12, B21, B13,
+        B31, B23 and B32 of the atom, with Bij = 8*pi**2*Uij. The Bij and
+        Bji parameters are the same.
+    Biso : ParameterAdapter
+        The isotropic displacement factor of the atom, as a B-factor.
     """
 
     def __init__(self, name, atom):
-        """Initialize.
+        """Initialize the atom ParameterSet.
 
         Parameters
         ----------
-        atom
-            A diffpy.structure.Atom instance
+        name : str
+            The name of this ParameterSet.
+        atom : diffpy.structure.Atom
+            The atom to adapt.
         """
         ParameterSet.__init__(self, name)
         self.atom = atom
@@ -174,43 +174,30 @@ def _latsetter(par):
 
 
 class DiffpyLatticeParSet(ParameterSet):
-    """A wrapper for diffpy.structure.Lattice.
+    """Adapt a diffpy.structure.Lattice to the ParameterSet interface.
 
     This class derives from diffpy.srfit.fitbase.parameterset.ParameterSet.
-    See this class for base attributes.
+    See that class for base attributes.
 
     Attributes
     ----------
-    lattice
-        The diffpy.structure.Lattice this is adapting
-    name
-        Always "lattice"
-    angunits
-        "deg", the units of angle
-
-    Parameters
-    ----------
-    a
-        Unit cell parameters (ParameterAdapter).
-    b
-        Unit cell parameters (ParameterAdapter).
-    c
-        Unit cell parameters (ParameterAdapter).
-    alpha
-        Unit cell parameters (ParameterAdapter).
-    beta
-        Unit cell parameters (ParameterAdapter).
-    gamma
-        Unit cell parameters (ParameterAdapter).
+    lattice : diffpy.structure.Lattice
+        The lattice this is adapting.
+    name : str
+        The name of this ParameterSet, always "lattice".
+    angunits : str
+        The units of the lattice angles, always "deg".
+    a, b, c, alpha, beta, gamma : ParameterAdapter
+        The unit cell parameters.
     """
 
     def __init__(self, lattice):
-        """Initialize.
+        """Initialize the lattice ParameterSet.
 
         Parameters
         ----------
-        lattice
-            A diffpy.structure.Lattice instance
+        lattice : diffpy.structure.Lattice
+            The lattice to adapt.
         """
         ParameterSet.__init__(self, "lattice")
         self.angunits = "deg"
@@ -250,39 +237,35 @@ class DiffpyLatticeParSet(ParameterSet):
 
 
 class DiffpyStructureParSet(SrRealParSet):
-    """A wrapper for diffpy.structure.Structure.
+    """Adapt a diffpy.structure.Structure to the ParameterSet interface.
 
-    This class derives from diffpy.srfit.fitbase.parameterset.ParameterSet. See
-    this class for base attributes.
+    This class derives from SrRealParSet. See that class for base
+    attributes.
 
     Attributes
     ----------
-    atoms
-        The list of DiffpyAtomParSets, provided for convenience.
-    stru
-        The diffpy.structure.Structure this is adapting
-
-    Managed ParameterSets
-    ---------------------
-    lattice
-        The managed DiffpyLatticeParSet
-    <el><idx>
-        A managed DiffpyAtomParSets. <el> is the atomic element and
-        <idx> is the index of that element in the structure,
-        starting from zero. Thus, for nickel in P1 symmetry, the
-        managed DiffpyAtomParSets will be named "Ni0", "Ni1", "Ni2"
-        and "Ni3".
+    atoms : list of DiffpyAtomParSet
+        The atom ParameterSets, provided for convenience.
+    stru : diffpy.structure.Structure
+        The structure this is adapting.
+    lattice : DiffpyLatticeParSet
+        The managed lattice ParameterSet.
+    <el><idx> : DiffpyAtomParSet
+        The managed atom ParameterSets. <el> is the atomic element and
+        <idx> is the index of that element in the structure, starting
+        from zero. For nickel in P1 symmetry, the managed
+        DiffpyAtomParSets are named "Ni0", "Ni1", "Ni2" and "Ni3".
     """
 
     def __init__(self, name, stru):
-        """Initialize.
+        """Initialize the structure ParameterSet.
 
         Parameters
         ----------
-        name
-            A name for the structure
-        stru
-            A diffpy.structure.Structure instance
+        name : str
+            The name of the structure.
+        stru : diffpy.structure.Structure
+            The structure to adapt.
         """
         SrRealParSet.__init__(self, name)
         self.stru = stru
@@ -307,24 +290,42 @@ class DiffpyStructureParSet(SrRealParSet):
     def __repr__(self):
         return repr(self.stru)
 
-    def getLattice(self):
-        """Get the ParameterSet containing the lattice Parameters."""
+    def get_lattice(self):
+        """Return the ParameterSet containing the lattice Parameters.
+
+        Returns
+        -------
+        DiffpyLatticeParSet
+            The lattice ParameterSet of the structure.
+        """
         return self.lattice
 
     @classmethod
-    def canAdapt(self, stru):
-        """Return whether the structure can be adapted by this class."""
+    def can_adapt(self, stru):
+        """Return whether the structure can be adapted by this class.
+
+        Parameters
+        ----------
+        stru : object
+            The structure object to check.
+
+        Returns
+        -------
+        bool
+            The flag indicating if `stru` is a diffpy.structure.Structure.
+        """
         from diffpy.structure import Structure
 
         return isinstance(stru, Structure)
 
-    def getScatterers(self):
-        """Get a list of ParameterSets that represents the scatterers.
+    def get_scatterers(self):
+        """Return the list of ParameterSets that represent the
+        scatterers.
 
-        The site positions must be accessible from the list entries via
-        the names "x", "y", and "z". The ADPs must be accessible as
-        well, but the name and nature of the ADPs (U-factors, B-factors,
-        isotropic, anisotropic) depends on the adapted structure.
+        Returns
+        -------
+        list of DiffpyAtomParSet
+            The atom ParameterSets of the structure.
         """
         return self.atoms
 

@@ -32,14 +32,14 @@ class BVSRestraint(Restraint):
 
     Attributes
     ----------
-    _calc
+    _calc : BVSCalculator
         The SrReal BVSCalculator instance.
-    _parset
+    _parset : SrRealParSet
         The SrRealParSet that created this BVSRestraint.
-    sig
+    sig : float
         The uncertainty on the BVS (default 1).
-    scaled
-        A flag indicating if the restraint is scaled (multiplied)
+    scaled : bool
+        The flag indicating if the restraint is scaled (multiplied)
         by the unrestrained point-average chi^2 (chi^2/numpoints)
         (default False).
     """
@@ -49,14 +49,14 @@ class BVSRestraint(Restraint):
 
         Parameters
         ----------
-        parset
-            SrRealParSet that creates this BVSRestraint.
-        sig
+        parset : SrRealParSet
+            The SrRealParSet that creates this BVSRestraint.
+        sig : float, optional
             The uncertainty on the BVS (default 1).
-        scaled
-            A flag indicating if the restraint is scaled
-            (multiplied) by the unrestrained point-average chi^2
-            (chi^2/numpoints) (bool, default False).
+        scaled : bool, optional
+            The flag indicating if the restraint is scaled (multiplied)
+            by the unrestrained point-average chi^2 (chi^2/numpoints)
+            (default False).
         """
         from diffpy.srreal.bvscalculator import BVSCalculator
 
@@ -71,9 +71,14 @@ class BVSRestraint(Restraint):
 
         Parameters
         ----------
-        w
+        w : float, optional
             The point-average chi^2 which is optionally used to scale the
-            penalty (float, default 1.0).
+            penalty (default 1.0).
+
+        Returns
+        -------
+        float
+            The bond-valence penalty.
         """
         # Get the bvms from the BVSCalculator
         stru = self._parset._get_srreal_structure()
