@@ -28,7 +28,7 @@ class SrRealParSet(BaseStructureParSet):
 
     Attributes
     ----------
-    stru : object
+    structure : object
         The adapted structure object.
     _usesymmetry : bool
         The flag indicating if SrReal calculators that operate on
@@ -38,7 +38,7 @@ class SrRealParSet(BaseStructureParSet):
     def __init__(self, *args, **kw):
         BaseStructureParSet.__init__(self, *args, **kw)
         self._usesymmetry = True
-        self.stru = None
+        self.structure = None
         return
 
     def restrain_bvs(self, sig=1, scaled=False):
@@ -66,13 +66,13 @@ class SrRealParSet(BaseStructureParSet):
             The restraint object, for use with the ``unrestrain`` method.
         """
         # Create the Restraint object
-        res = BVSRestraint(self, sig, scaled)
+        restraint = BVSRestraint(self, sig, scaled)
         # Add it to the _restraints set
-        self._restraints.add(res)
+        self._restraints.add(restraint)
         # Our configuration changed. Notify observers.
         self._update_configuration()
         # Return the Restraint object
-        return res
+        return restraint
 
     def use_symmetry(self, use=True):
         """Set whether this structure uses symmetry.
@@ -107,5 +107,5 @@ class SrRealParSet(BaseStructureParSet):
         from diffpy.srreal.structureadapter import nosymmetry
 
         if self._usesymmetry:
-            return self.stru
-        return nosymmetry(self.stru)
+            return self.structure
+        return nosymmetry(self.structure)

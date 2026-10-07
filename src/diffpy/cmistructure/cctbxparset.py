@@ -53,21 +53,21 @@ class CCTBXScattererParSet(ParameterSet):
         The isotropic displacement factor of the atom.
     """
 
-    def __init__(self, name, strups, idx):
+    def __init__(self, name, structure_parameter_set, index):
         """Initialize the scatterer ParameterSet.
 
         Parameters
         ----------
         name : str
             The name of this scatterer.
-        strups : CCTBXCrystalParSet
+        structure_parameter_set : CCTBXCrystalParSet
             The CCTBXCrystalParSet that contains the cctbx structure.
-        idx : int
+        index : int
             The index of the scatterer in the structure.
         """
         ParameterSet.__init__(self, name)
-        self.strups = strups
-        self.idx = idx
+        self.structure_parameter_set = structure_parameter_set
+        self.index = index
 
         # x, y, z, occupancy
         self.add_parameter(
@@ -92,36 +92,52 @@ class CCTBXScattererParSet(ParameterSet):
     def _xyzgetter(self, i):
 
         def f(dummy):
-            return self.strups.stru.scatterers()[self.idx].site[i]
+            return self.structure_parameter_set.structure.scatterers()[
+                self.index
+            ].site[i]
 
         return f
 
     def _xyzsetter(self, i):
 
         def f(dummy, value):
-            xyz = list(self.strups.stru.scatterers()[self.idx].site)
+            xyz = list(
+                self.structure_parameter_set.structure.scatterers()[
+                    self.index
+                ].site
+            )
             xyz[i] = value
-            self.strups.stru.scatterers()[self.idx].site = tuple(xyz)
+            self.structure_parameter_set.structure.scatterers()[
+                self.index
+            ].site = tuple(xyz)
             return
 
         return f
 
     def _getocc(self, dummy):
-        return self.strups.stru.scatterers()[self.idx].occupancy
+        return self.structure_parameter_set.structure.scatterers()[
+            self.index
+        ].occupancy
 
     def _setocc(self, dummy, value):
-        self.strups.stru.scatterers()[self.idx].occupancy = value
+        self.structure_parameter_set.structure.scatterers()[
+            self.index
+        ].occupancy = value
         return
 
     def _getuiso(self, dummy):
-        return self.strups.stru.scatterers()[self.idx].u_iso
+        return self.structure_parameter_set.structure.scatterers()[
+            self.index
+        ].u_iso
 
     def _setuiso(self, dummy, value):
-        self.strups.stru.scatterers()[self.idx].u_iso = value
+        self.structure_parameter_set.structure.scatterers()[
+            self.index
+        ].u_iso = value
         return
 
     def _getelem(self):
-        return self.stru.element_symbol()
+        return self.structure.element_symbol()
 
     element = property(_getelem)
 
@@ -140,18 +156,20 @@ class CCTBXUnitCellParSet(ParameterSet):
         The unit cell parameters.
     """
 
-    def __init__(self, strups):
+    def __init__(self, structure_parameter_set):
         """Initialize the unit cell ParameterSet.
 
         Parameters
         ----------
-        strups : CCTBXCrystalParSet
+        structure_parameter_set : CCTBXCrystalParSet
             The CCTBXCrystalParSet that contains the cctbx structure
             and the unit cell being wrapped.
         """
         ParameterSet.__init__(self, "unitcell")
-        self.strups = strups
-        self._latpars = list(self.strups.stru.unit_cell().parameters())
+        self.structure_parameter_set = structure_parameter_set
+        self._lattice_parameters = list(
+            self.structure_parameter_set.structure.unit_cell().parameters()
+        )
 
         self.add_parameter(
             ParameterAdapter("a", None, self._latgetter(0), self._latsetter(0))
@@ -183,15 +201,15 @@ class CCTBXUnitCellParSet(ParameterSet):
     def _latgetter(self, i):
 
         def f(dummy):
-            return self._latpars[i]
+            return self._lattice_parameters[i]
 
         return f
 
     def _latsetter(self, i):
 
         def f(dummy, value):
-            self._latpars[i] = value
-            self.strups._update = True
+            self._lattice_parameters[i] = value
+            self.structure_parameter_set._update = True
             return
 
         return f
@@ -207,7 +225,7 @@ class CCTBXCrystalParSet(BaseStructureParSet):
 
     Attributes
     ----------
-    stru : cctbx.crystal.special_position_settings
+    structure : cctbx.crystal.special_position_settings
         The adapted cctbx structure object.
     scatterers : list of CCTBXScattererParSet
         The scatterer ParameterSets.
@@ -215,25 +233,25 @@ class CCTBXCrystalParSet(BaseStructureParSet):
         The unit cell ParameterSet for the structure.
     """
 
-    def __init__(self, name, stru):
+    def __init__(self, name, structure):
         """Initialize the crystal ParameterSet.
 
         Parameters
         ----------
         name : str
             The name of this ParameterSet.
-        stru : cctbx.crystal.special_position_settings
+        structure : cctbx.crystal.special_position_settings
             The cctbx structure to adapt.
         """
         ParameterSet.__init__(self, name)
-        self.stru = stru
+        self.structure = structure
         self.add_parameter_set(CCTBXUnitCellParSet(self))
         self.scatterers = []
 
         self._update = False
 
         cdict = {}
-        for s in stru.scatterers():
+        for s in structure.scatterers():
             el = s.element_symbol()
             i = cdict.get(el, 0)
             sname = "%s%i" % (el, i)
@@ -260,39 +278,41 @@ class CCTBXCrystalParSet(BaseStructureParSet):
             return
 
         self._update = False
-        stru = self.stru
-        sgn = stru.space_group().match_tabulated_settings().number()
+        structure = self.structure
+        sgn = structure.space_group().match_tabulated_settings().number()
 
         # Create the symmetry object
         from cctbx.crystal import symmetry
 
         symm = symmetry(
-            unit_cell=self.unitcell._latpars, space_group_symbol=sgn
+            unit_cell=self.unitcell._lattice_parameters, space_group_symbol=sgn
         )
 
         # Now the new structure
-        newstru = stru.__class__(
-            crystal_symmetry=symm, scatterers=stru.scatterers()
+        newstru = structure.__class__(
+            crystal_symmetry=symm, scatterers=structure.scatterers()
         )
 
-        self.unitcell._latpars = list(newstru.unit_cell().parameters())
+        self.unitcell._lattice_parameters = list(
+            newstru.unit_cell().parameters()
+        )
 
-        self.stru = newstru
+        self.structure = newstru
         return
 
     @classmethod
-    def can_adapt(self, stru):
+    def can_adapt(self, structure):
         """Return whether the structure can be adapted by this class.
 
         Parameters
         ----------
-        stru : object
+        structure : object
             The structure object to check.
 
         Returns
         -------
         bool
-            The flag indicating if `stru` is a
+            The flag indicating if `structure` is a
             cctbx.crystal.special_position_settings. False if cctbx is
             not installed.
         """
@@ -300,7 +320,7 @@ class CCTBXCrystalParSet(BaseStructureParSet):
             from cctbx.crystal import special_position_settings
         except ImportError:
             return False
-        return isinstance(stru, special_position_settings)
+        return isinstance(structure, special_position_settings)
 
     def get_lattice(self):
         """Return the ParameterSet containing the lattice Parameters.
@@ -332,8 +352,8 @@ class CCTBXCrystalParSet(BaseStructureParSet):
         str
             The Hermann-Mauguin space group symbol.
         """
-        sg = self.stru.space_group()
-        t = sg.type()
+        space_group = self.structure.space_group()
+        t = space_group.type()
         return t.lookup_symbol()
 
 

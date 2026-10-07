@@ -34,7 +34,7 @@ class BVSRestraint(Restraint):
     ----------
     _calc : BVSCalculator
         The SrReal BVSCalculator instance.
-    _parset : SrRealParSet
+    _parameter_set : SrRealParSet
         The SrRealParSet that created this BVSRestraint.
     sig : float
         The uncertainty on the BVS (default 1).
@@ -44,12 +44,12 @@ class BVSRestraint(Restraint):
         (default False).
     """
 
-    def __init__(self, parset, sig=1, scaled=False):
+    def __init__(self, parameter_set, sig=1, scaled=False):
         """Initialize the Restraint.
 
         Parameters
         ----------
-        parset : SrRealParSet
+        parameter_set : SrRealParSet
             The SrRealParSet that creates this BVSRestraint.
         sig : float, optional
             The uncertainty on the BVS (default 1).
@@ -61,7 +61,7 @@ class BVSRestraint(Restraint):
         from diffpy.srreal.bvscalculator import BVSCalculator
 
         self._calc = BVSCalculator()
-        self._parset = parset
+        self._parameter_set = parameter_set
         self.sig = float(sig)
         self.scaled = bool(scaled)
         return
@@ -81,8 +81,8 @@ class BVSRestraint(Restraint):
             The bond-valence penalty.
         """
         # Get the bvms from the BVSCalculator
-        stru = self._parset._get_srreal_structure()
-        self._calc.eval(stru)
+        structure = self._parameter_set._get_srreal_structure()
+        self._calc.eval(structure)
         penalty = self._calc.bvmsdiff
 
         # Scale by the prefactor

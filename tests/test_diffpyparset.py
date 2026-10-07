@@ -106,9 +106,9 @@ def test___repr__():
 
     lat = Lattice(3, 3, 2, 90, 90, 90)
     atom = Atom("C", [0, 0.2, 0.5])
-    stru = Structure([atom], lattice=lat)
-    dsps = DiffpyStructureParSet("dsps", stru)
-    assert repr(stru) == repr(dsps)
+    structure = Structure([atom], lattice=lat)
+    dsps = DiffpyStructureParSet("dsps", structure)
+    assert repr(structure) == repr(dsps)
     assert repr(lat) == repr(dsps.lattice)
     assert repr(atom) == repr(dsps.atoms[0])
     return
@@ -118,8 +118,8 @@ def test_pickling():
     """Test pickling of DiffpyStructureParSet."""
     from diffpy.structure import Atom, Structure
 
-    stru = Structure([Atom("C", [0, 0.2, 0.5])])
-    dsps = DiffpyStructureParSet("dsps", stru)
+    structure = Structure([Atom("C", [0, 0.2, 0.5])])
+    dsps = DiffpyStructureParSet("dsps", structure)
     data = pickle.dumps(dsps)
     dsps2 = pickle.loads(data)
     assert 1 == len(dsps2.atoms)

@@ -146,8 +146,8 @@ class TestParameterAdapter:
         ocmol.AddBondAngle(ocmol[0], ocmol[7], ocmol[44], 1.3, 0.1, 0.1)
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
         m.wrap_restraints()
 
         # make sure that we have some restraints in the molecule
@@ -166,19 +166,19 @@ class TestParameterAdapter:
         """Test the structure conversion."""
         occryst = self.occryst
         ocmol = self.ocmol
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
 
-        assert cryst.name == "bucky"
+        assert crystal.name == "bucky"
 
         def _testCrystal():
             # Test the lattice
-            assert occryst.a == pytest.approx(cryst.a.value)
-            assert occryst.b == pytest.approx(cryst.b.get_value())
-            assert occryst.c == pytest.approx(cryst.c.get_value())
-            assert occryst.alpha == pytest.approx(cryst.alpha.get_value())
-            assert occryst.beta == pytest.approx(cryst.beta.get_value())
-            assert occryst.gamma == pytest.approx(cryst.gamma.get_value())
+            assert occryst.a == pytest.approx(crystal.a.value)
+            assert occryst.b == pytest.approx(crystal.b.get_value())
+            assert occryst.c == pytest.approx(crystal.c.get_value())
+            assert occryst.alpha == pytest.approx(crystal.alpha.get_value())
+            assert occryst.beta == pytest.approx(crystal.beta.get_value())
+            assert occryst.gamma == pytest.approx(crystal.gamma.get_value())
             return
 
         def _testMolecule():
@@ -222,11 +222,11 @@ class TestParameterAdapter:
         _testMolecule()
 
         # Now change values from the srfit StructureParSet
-        cryst.c60.C44.x.set_value(1.1)
-        cryst.c60.C44.occ.set_value(1.1)
-        cryst.c60.C44.Biso.set_value(1.1)
-        cryst.c60.q3.set_value(1.1)
-        cryst.a.set_value(1.1)
+        crystal.c60.C44.x.set_value(1.1)
+        crystal.c60.C44.occ.set_value(1.1)
+        crystal.c60.C44.Biso.set_value(1.1)
+        crystal.c60.q3.set_value(1.1)
+        crystal.a.set_value(1.1)
 
         _testCrystal()
         _testMolecule()
@@ -242,8 +242,8 @@ class TestParameterAdapter:
         ocmol.AddBond(ocmol[0], ocmol[7], 3.3, 0.1, 0.1)
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
         m.wrap_restraints()
 
         # make sure that we have some restraints in the molecule
@@ -272,8 +272,8 @@ class TestParameterAdapter:
         )
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
         m.wrap_restraints()
 
         # make sure that we have some restraints in the molecule
@@ -299,8 +299,8 @@ class TestParameterAdapter:
         ocmol = self.ocmol
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
 
         # make some bond angle restraints
         res0 = m.restrain_bond_length(m.atoms[0], m.atoms[5], 3.3, 0.1, 0.1)
@@ -328,8 +328,8 @@ class TestParameterAdapter:
         ocmol = self.ocmol
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
 
         # restrain some bond angles
         res0 = m.restrain_bond_angle(
@@ -356,8 +356,8 @@ class TestParameterAdapter:
         ocmol = self.ocmol
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
 
         # Restrain some dihedral angles.
         res0 = m.restrain_dihedral_angle(
@@ -383,8 +383,8 @@ class TestParameterAdapter:
         occryst = self.occryst
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
 
         a0 = m.atoms[0]
         a7 = m.atoms[7]
@@ -453,8 +453,8 @@ class TestParameterAdapter:
         occryst = self.occryst
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
 
         a0 = m.atoms[0]
         a7 = m.atoms[7]
@@ -531,8 +531,8 @@ class TestParameterAdapter:
         occryst = self.occryst
 
         # make our crystal
-        cryst = ObjCrystCrystalParSet("bucky", occryst)
-        m = cryst.c60
+        crystal = ObjCrystCrystalParSet("bucky", occryst)
+        m = crystal.c60
 
         a0 = m.atoms[0]
         a7 = m.atoms[7]
@@ -638,17 +638,19 @@ class TestCreateSpaceGroup:
         from diffpy.structure import spacegroups
 
     @staticmethod
-    def getObjCrystParSetSpaceGroup(sg):
+    def getObjCrystParSetSpaceGroup(space_group):
         """Make an ObjCrystCrystalParSet with the proper space group."""
         from pyobjcryst.spacegroup import SpaceGroup
 
-        sgobjcryst = SpaceGroup(sg.short_name)
+        sgobjcryst = SpaceGroup(space_group.short_name)
         sgnew = ObjCrystCrystalParSet._create_space_group(sgobjcryst)
         return sgnew
 
     @staticmethod
-    def hashDiffPySpaceGroup(sg):
-        lines = [str(sg.number % 1000)] + sorted(map(str, sg.iter_symops()))
+    def hashDiffPySpaceGroup(space_group):
+        lines = [str(space_group.number % 1000)] + sorted(
+            map(str, space_group.iter_symops())
+        )
         s = "\n".join(lines)
         return s
 
@@ -672,10 +674,10 @@ class TestCreateSpaceGroup:
             shn = smbls.hermann_mauguin()
             short_name = shn.replace(" ", "")
             if spacegroups.IsSpaceGroupIdentifier(short_name):
-                sg = spacegroups.GetSpaceGroup(shn)
-                sgnew = self.getObjCrystParSetSpaceGroup(sg)
+                space_group = spacegroups.GetSpaceGroup(shn)
+                sgnew = self.getObjCrystParSetSpaceGroup(space_group)
                 # print("dbsg: " + repr(self.sgsEquivalent(sg, sgnew)))
-                assert self.sgsEquivalent(sg, sgnew)
+                assert self.sgsEquivalent(space_group, sgnew)
         return
 
 

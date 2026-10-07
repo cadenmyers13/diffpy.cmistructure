@@ -32,23 +32,23 @@ class BaseStructureParSet(ParameterSet):
 
     Attributes
     ----------
-    stru : object
+    structure : object
         The adapted structure object.
     """
 
     @classmethod
-    def can_adapt(self, stru):
+    def can_adapt(self, structure):
         """Return whether the structure can be adapted by this class.
 
         Parameters
         ----------
-        stru : object
+        structure : object
             The structure object to check.
 
         Returns
         -------
         bool
-            The flag indicating if `stru` can be adapted. The base class
+            The flag indicating if `structure` can be adapted. The base class
             always returns False.
         """
         return False
@@ -60,7 +60,7 @@ class BaseStructureParSet(ParameterSet):
         lattice Parameters. It is assumed that the lattice parameters
         are named "a", "b", "c", "alpha", "beta", "gamma".
 
-        The lattice must also have the "angunits" attribute, which is
+        The lattice must also have the "angle_units" attribute, which is
         either "deg" or "rad", to signify degrees or radians.
 
         Returns

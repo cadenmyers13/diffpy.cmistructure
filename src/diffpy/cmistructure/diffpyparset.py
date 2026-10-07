@@ -165,12 +165,12 @@ class DiffpyAtomParSet(ParameterSet):
 # End class DiffpyAtomParSet
 
 
-def _latgetter(par):
-    return bind2nd(getattr, par)
+def _latgetter(parameter):
+    return bind2nd(getattr, parameter)
 
 
-def _latsetter(par):
-    return bind2nd(setattr, par)
+def _latsetter(parameter):
+    return bind2nd(setattr, parameter)
 
 
 class DiffpyLatticeParSet(ParameterSet):
@@ -185,7 +185,7 @@ class DiffpyLatticeParSet(ParameterSet):
         The lattice this is adapting.
     name : str
         The name of this ParameterSet, always "lattice".
-    angunits : str
+    angle_units : str
         The units of the lattice angles, always "deg".
     a, b, c, alpha, beta, gamma : ParameterAdapter
         The unit cell parameters.
@@ -200,7 +200,7 @@ class DiffpyLatticeParSet(ParameterSet):
             The lattice to adapt.
         """
         ParameterSet.__init__(self, "lattice")
-        self.angunits = "deg"
+        self.angle_units = "deg"
         self.lattice = lattice
         lat = lattice
         self.add_parameter(
@@ -246,7 +246,7 @@ class DiffpyStructureParSet(SrRealParSet):
     ----------
     atoms : list of DiffpyAtomParSet
         The atom ParameterSets, provided for convenience.
-    stru : diffpy.structure.Structure
+    structure : diffpy.structure.Structure
         The structure this is adapting.
     lattice : DiffpyLatticeParSet
         The managed lattice ParameterSet.
@@ -257,23 +257,23 @@ class DiffpyStructureParSet(SrRealParSet):
         DiffpyAtomParSets are named "Ni0", "Ni1", "Ni2" and "Ni3".
     """
 
-    def __init__(self, name, stru):
+    def __init__(self, name, structure):
         """Initialize the structure ParameterSet.
 
         Parameters
         ----------
         name : str
             The name of the structure.
-        stru : diffpy.structure.Structure
+        structure : diffpy.structure.Structure
             The structure to adapt.
         """
         SrRealParSet.__init__(self, name)
-        self.stru = stru
-        self.add_parameter_set(DiffpyLatticeParSet(stru.lattice))
+        self.structure = structure
+        self.add_parameter_set(DiffpyLatticeParSet(structure.lattice))
         self.atoms = []
 
         cdict = {}
-        for a in stru:
+        for a in structure:
             el = a.element.title()
             # Try to sanitize the name.
             el = el.replace("+", "p")
@@ -288,7 +288,7 @@ class DiffpyStructureParSet(SrRealParSet):
         return
 
     def __repr__(self):
-        return repr(self.stru)
+        return repr(self.structure)
 
     def get_lattice(self):
         """Return the ParameterSet containing the lattice Parameters.
@@ -301,22 +301,22 @@ class DiffpyStructureParSet(SrRealParSet):
         return self.lattice
 
     @classmethod
-    def can_adapt(self, stru):
+    def can_adapt(self, structure):
         """Return whether the structure can be adapted by this class.
 
         Parameters
         ----------
-        stru : object
+        structure : object
             The structure object to check.
 
         Returns
         -------
         bool
-            The flag indicating if `stru` is a diffpy.structure.Structure.
+            The flag indicating if `structure` is a diffpy.structure.Structure.
         """
         from diffpy.structure import Structure
 
-        return isinstance(stru, Structure)
+        return isinstance(structure, Structure)
 
     def get_scatterers(self):
         """Return the list of ParameterSets that represent the
@@ -338,8 +338,8 @@ class DiffpyStructureParSet(SrRealParSet):
         """
         from diffpy.srreal.structureadapter import nometa
 
-        stru = SrRealParSet._get_srreal_structure(self)
-        return nometa(stru)
+        structure = SrRealParSet._get_srreal_structure(self)
+        return nometa(structure)
 
 
 # End class DiffpyStructureParSet

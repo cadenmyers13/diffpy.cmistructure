@@ -37,16 +37,16 @@ def test_ObjCryst_constrain_space_group(pyobjcryst_available):
     pi = numpy.pi
 
     occryst = makeLaMnO3()
-    stru = ObjCrystCrystalParSet(occryst.GetName(), occryst)
+    structure = ObjCrystCrystalParSet(occryst.GetName(), occryst)
     # Make sure we actually create the constraints
-    stru._constrain_space_group()
+    structure._constrain_space_group()
     # Make the space group parameters individually
-    stru.sgpars.latpars
-    stru.sgpars.xyzpars
-    stru.sgpars.adppars
+    structure.space_group_parameters.lattice_parameters
+    structure.space_group_parameters.xyz_parameters
+    structure.space_group_parameters.adp_parameters
 
     # Check the orthorhombic lattice
-    lattice = stru.get_lattice()
+    lattice = structure.get_lattice()
     assert lattice.alpha.const
     assert lattice.beta.const
     assert lattice.gamma.const
@@ -60,7 +60,7 @@ def test_ObjCryst_constrain_space_group(pyobjcryst_available):
     assert 0 == len(lattice._constraints)
 
     # Now make sure the scatterers are constrained properly
-    scatterers = stru.get_scatterers()
+    scatterers = structure.get_scatterers()
     la = scatterers[0]
     assert not la.x.const
     assert not la.y.const
@@ -113,23 +113,23 @@ def test_DiffPy_constrain_as_space_group(datafile, pyobjcryst_available):
     from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
     from diffpy.cmistructure.sgconstraints import constrain_as_space_group
 
-    stru = makeLaMnO3_P1(datafile)
-    parset = DiffpyStructureParSet("LaMnO3", stru)
+    structure = makeLaMnO3_P1(datafile)
+    parameter_set = DiffpyStructureParSet("LaMnO3", structure)
 
-    sgpars = constrain_as_space_group(
-        parset,
+    space_group_parameters = constrain_as_space_group(
+        parameter_set,
         "P b n m",
-        scatterers=parset.get_scatterers()[::2],
+        scatterers=parameter_set.get_scatterers()[::2],
         constrainadps=True,
     )
 
     # Make sure that the new parameters were created
-    for par in sgpars:
-        assert par is not None
-        assert par.get_value() is not None
+    for parameter in space_group_parameters:
+        assert parameter is not None
+        assert parameter.get_value() is not None
 
     # Test the unconstrained atoms
-    for scatterer in parset.get_scatterers()[1::2]:
+    for scatterer in parameter_set.get_scatterers()[1::2]:
         assert not scatterer.x.const
         assert not scatterer.y.const
         assert not scatterer.z.const
@@ -141,29 +141,33 @@ def test_DiffPy_constrain_as_space_group(datafile, pyobjcryst_available):
         assert not scatterer.U23.const
         assert 0 == len(scatterer._constraints)
 
-    proxied = [p.par for p in sgpars]
+    proxied = [p.par for p in space_group_parameters]
 
-    def _consttest(par):
-        return par.const
+    def _consttest(parameter):
+        return parameter.const
 
-    def _constrainedtest(par):
-        return par.constrained
+    def _constrainedtest(parameter):
+        return parameter.constrained
 
-    def _proxytest(par):
-        return par in proxied
+    def _proxytest(parameter):
+        return parameter in proxied
 
-    def _alltests(par):
-        return _consttest(par) or _constrainedtest(par) or _proxytest(par)
+    def _alltests(parameter):
+        return (
+            _consttest(parameter)
+            or _constrainedtest(parameter)
+            or _proxytest(parameter)
+        )
 
-    for idx, scatterer in enumerate(parset.get_scatterers()[::2]):
+    for index, scatterer in enumerate(parameter_set.get_scatterers()[::2]):
         # Under this scheme, atom 6 is free to vary
         test = False
-        for par in [scatterer.x, scatterer.y, scatterer.z]:
-            test |= _alltests(par)
+        for parameter in [scatterer.x, scatterer.y, scatterer.z]:
+            test |= _alltests(parameter)
         assert test
 
         test = False
-        for par in [
+        for parameter in [
             scatterer.U11,
             scatterer.U22,
             scatterer.U33,
@@ -171,7 +175,7 @@ def test_DiffPy_constrain_as_space_group(datafile, pyobjcryst_available):
             scatterer.U13,
             scatterer.U23,
         ]:
-            test |= _alltests(par)
+            test |= _alltests(parameter)
 
         assert test
 
@@ -188,24 +192,24 @@ def test_constrain_as_space_group_args(pyobjcryst_available, datafile):
     from diffpy.cmistructure.sgconstraints import constrain_as_space_group
     from diffpy.structure.spacegroups import GetSpaceGroup
 
-    stru = makeLaMnO3_P1(datafile)
-    parset = DiffpyStructureParSet("LaMnO3", stru)
-    sgpars = constrain_as_space_group(parset, "P b n m")
-    sg = GetSpaceGroup("P b n m")
+    structure = makeLaMnO3_P1(datafile)
+    parameter_set = DiffpyStructureParSet("LaMnO3", structure)
+    space_group_parameters = constrain_as_space_group(parameter_set, "P b n m")
+    space_group = GetSpaceGroup("P b n m")
     parset2 = DiffpyStructureParSet("LMO", makeLaMnO3_P1(datafile))
-    sgpars2 = constrain_as_space_group(parset2, sg)
-    list(sgpars)
+    sgpars2 = constrain_as_space_group(parset2, space_group)
+    list(space_group_parameters)
     list(sgpars2)
-    assert sgpars.names == sgpars2.names
+    assert space_group_parameters.names == sgpars2.names
     return
 
 
 def makeLaMnO3_P1(datafile):
     from diffpy.structure import Structure
 
-    stru = Structure()
-    stru.read(datafile("LaMnO3.stru"))
-    return stru
+    structure = Structure()
+    structure.read(datafile("LaMnO3.stru"))
+    return structure
 
 
 def makeLaMnO3():
