@@ -792,8 +792,8 @@ class TestCreateSpaceGroup:
         for smbls in sgtbx.space_group_symbol_iterator():
             shn = smbls.hermann_mauguin()
             short_name = shn.replace(" ", "")
-            if spacegroups.IsSpaceGroupIdentifier(short_name):
-                space_group = spacegroups.GetSpaceGroup(shn)
+            if spacegroups.is_space_group_identifier(short_name):
+                space_group = spacegroups.get_space_group(shn)
                 sgnew = self.getObjCrystParSetSpaceGroup(space_group)
                 actual_equivalent = self.sgsEquivalent(space_group, sgnew)
                 expected_equivalent = True

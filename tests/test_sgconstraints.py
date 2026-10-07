@@ -227,14 +227,14 @@ def test_constrain_as_space_group_args(datafile):
     function."""
     from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
     from diffpy.cmistructure.sgconstraints import constrain_as_space_group
-    from diffpy.structure.spacegroups import GetSpaceGroup
+    from diffpy.structure.spacegroups import get_space_group
 
     # C1: The space group is given as a symbol or as a SpaceGroup object.
     # Expected: Both create the same space group Parameters.
     structure = makeLaMnO3_P1(datafile)
     parameter_set = DiffpyStructureParSet("LaMnO3", structure)
     symbol_parameters = constrain_as_space_group(parameter_set, "P b n m")
-    space_group = GetSpaceGroup("P b n m")
+    space_group = get_space_group("P b n m")
     object_parameter_set = DiffpyStructureParSet(
         "LMO", makeLaMnO3_P1(datafile)
     )
