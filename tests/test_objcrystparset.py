@@ -113,11 +113,8 @@ def makeC60():
 
 class TestParameterAdapter:
     @pytest.fixture(autouse=True)
-    def setup(self, pyobjcryst_available):
+    def setup(self):
         # shared setup
-        if not pyobjcryst_available:
-            pytest.skip("pyobjcryst package not available")
-
         global ObjCrystCrystalParSet, Crystal, Atom, Molecule
         global ScatteringPowerAtom
         from pyobjcryst.atom import Atom
@@ -626,13 +623,8 @@ class TestCreateSpaceGroup:
     """
 
     @pytest.fixture(autouse=True)
-    def setup(self, diffpy_structure_available, pyobjcryst_available):
+    def setup(self):
         # shared setup
-        if not diffpy_structure_available:
-            pytest.skip("diffpy.structure package not available")
-        if not pyobjcryst_available:
-            pytest.skip("pyobjcryst package not available")
-
         global ObjCrystCrystalParSet, spacegroups
         from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
         from diffpy.structure import spacegroups
@@ -665,10 +657,7 @@ class TestCreateSpaceGroup:
     def xtestCreateSpaceGroup(self):
         """Check all sgtbx space groups for proper conversion to
         SpaceGroup."""
-        try:
-            from cctbx import sgtbx
-        except ImportError:
-            return
+        from cctbx import sgtbx
 
         for smbls in sgtbx.space_group_symbol_iterator():
             shn = smbls.hermann_mauguin()

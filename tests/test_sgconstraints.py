@@ -22,16 +22,13 @@ import pytest
 # ----------------------------------------------------------------------------
 
 
-def test_ObjCryst_constrain_space_group(pyobjcryst_available):
+def test_ObjCryst_constrain_space_group():
     """Make sure that all Parameters are constrained properly.
 
     This tests constrainSpaceGroup from
     diffpy.cmistructure.sgconstraints, which is performed automatically
     when an ObjCrystCrystalParSet is created.
     """
-    if not pyobjcryst_available:
-        pytest.skip("pyobjcrysta package not available")
-
     from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
 
     pi = numpy.pi
@@ -105,11 +102,8 @@ def test_ObjCryst_constrain_space_group(pyobjcryst_available):
     return
 
 
-def test_DiffPy_constrain_as_space_group(datafile, pyobjcryst_available):
+def test_DiffPy_constrain_as_space_group(datafile):
     """Test the constrain_as_space_group function."""
-    if not pyobjcryst_available:
-        pytest.skip("pyobjcrysta package not available")
-
     from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
     from diffpy.cmistructure.sgconstraints import constrain_as_space_group
 
@@ -182,12 +176,9 @@ def test_DiffPy_constrain_as_space_group(datafile, pyobjcryst_available):
     return
 
 
-def test_constrain_as_space_group_args(pyobjcryst_available, datafile):
+def test_constrain_as_space_group_args(datafile):
     """Test the arguments processing of constrain_as_space_group
     function."""
-    if not pyobjcryst_available:
-        pytest.skip("pyobjcrysta package not available")
-
     from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
     from diffpy.cmistructure.sgconstraints import constrain_as_space_group
     from diffpy.structure.spacegroups import GetSpaceGroup

@@ -1,12 +1,8 @@
 import importlib.resources
 import json
-import logging
-from functools import lru_cache
 from pathlib import Path
 
 import pytest
-
-logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -22,44 +18,6 @@ def user_filesystem(tmp_path):
         json.dump(home_config_data, f)
 
     yield tmp_path
-
-
-# diffpy.structure
-@lru_cache()
-def has_diffpy_structure():
-    try:
-        import diffpy.structure as m
-
-        del m
-        return True
-    except ImportError:
-        logger.warning(
-            "Cannot import diffpy.structure, Structure tests skipped."
-        )
-        return False
-
-
-# pyobjcryst
-@lru_cache()
-def has_pyobjcryst():
-    try:
-        import pyobjcryst as m
-
-        del m
-        return True
-    except ImportError:
-        logger.warning("Cannot import pyobjcryst, pyobjcryst tests skipped.")
-        return False
-
-
-@pytest.fixture(scope="session")
-def diffpy_structure_available():
-    return has_diffpy_structure()
-
-
-@pytest.fixture(scope="session")
-def pyobjcryst_available():
-    return has_pyobjcryst()
 
 
 @pytest.fixture(scope="session")
