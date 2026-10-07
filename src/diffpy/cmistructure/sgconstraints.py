@@ -20,19 +20,8 @@ import numpy
 
 from diffpy.srfit.fitbase.parameter import ParameterProxy
 from diffpy.srfit.fitbase.recipeorganizer import RecipeContainer
-from diffpy.utils._deprecator import build_deprecation_message, deprecated
 
-__all__ = ["constrain_as_space_group", "constrainAsSpaceGroup"]
-
-removal_version = "4.0.0"
-sgconstraints_base = "diffpy.cmistructure.sgconstraints"
-
-constrainAsSpaceGroup_dep_msg = build_deprecation_message(
-    sgconstraints_base,
-    "constrainAsSpaceGroup",
-    "constrain_as_space_group",
-    removal_version,
-)
+__all__ = ["constrain_as_space_group"]
 
 
 def constrain_as_space_group(
@@ -129,36 +118,6 @@ def constrain_as_space_group(
     )
 
     return sgp
-
-
-@deprecated(constrainAsSpaceGroup_dep_msg)
-def constrainAsSpaceGroup(
-    phase,
-    spacegroup,
-    scatterers=None,
-    sgoffset=[0, 0, 0],
-    constrainlat=True,
-    constrainadps=True,
-    adpsymbols=None,
-    isosymbol="Uiso",
-):
-    """This function is deprecated and will be removed in version
-    4.0.0.
-
-    Please use
-    diffpy.cmistructure.sgconstraints.constrain_as_space_group
-    instead.
-    """
-    return constrain_as_space_group(
-        phase,
-        spacegroup,
-        scatterers,
-        sgoffset,
-        constrainlat,
-        constrainadps,
-        adpsymbols,
-        isosymbol,
-    )
 
 
 def _constrain_as_space_group(

@@ -58,35 +58,6 @@ from diffpy.srfit.fitbase.parameter import (
     ParameterProxy,
 )
 from diffpy.srfit.fitbase.parameterset import ParameterSet
-from diffpy.utils._deprecator import build_deprecation_message, deprecated
-
-removal_version = "4.0.0"
-bl_base = "diffpy.cmistructure.objcrystparset.ObjCrystBondLengthParameter"
-
-bl_setConst_dep_msg = build_deprecation_message(
-    bl_base,
-    "setConst",
-    "set_constant",
-    removal_version,
-)
-
-ba_base = "diffpy.cmistructure.objcrystparset.ObjCrystBondAngleParameter"
-
-ba_setConst_dep_msg = build_deprecation_message(
-    ba_base,
-    "setConst",
-    "set_constant",
-    removal_version,
-)
-
-da_base = "diffpy.cmistructure.objcrystparset.ObjCrystDihedralAngleParameter"
-
-da_setConst_dep_msg = build_deprecation_message(
-    da_base,
-    "setConst",
-    "set_constant",
-    removal_version,
-)
 
 
 class ObjCrystScattererParSet(ParameterSet):
@@ -1392,18 +1363,6 @@ class ObjCrystBondLengthParameter(StretchModeParameter):
             a.z.set_constant(is_constant)
         return self
 
-    @deprecated(bl_setConst_dep_msg)
-    def setConst(self, const=True, value=None):
-        """This function has been deprecated and will be removed in version
-        4.0.0.
-
-        Please use
-        diffpy.cmistructure.objcryst.ObjCrystBondLengthParameter.set_constant
-        instead.
-        """
-        self.set_constant(const, value)
-        return self
-
     def get_value(self):
         """This calculates the value if it might have been changed.
 
@@ -1551,18 +1510,6 @@ class ObjCrystBondAngleParameter(StretchModeParameter):
             a.x.set_constant(is_constant)
             a.y.set_constant(is_constant)
             a.z.set_constant(is_constant)
-        return self
-
-    @deprecated(ba_setConst_dep_msg)
-    def setConst(self, const=True, value=None):
-        """This function has been deprecated and will be removed in
-        version 4.0.0.
-
-        Please use
-        diffpy.cmistructure.objcryst.ObjCrystBondAngleParameter.set_constant
-        instead.
-        """
-        self.set_constant(const, value)
         return self
 
     def get_value(self):
@@ -1731,18 +1678,6 @@ class ObjCrystDihedralAngleParameter(StretchModeParameter):
             a.x.set_constant(is_constant)
             a.y.set_constant(is_constant)
             a.z.set_constant(is_constant)
-        return self
-
-    @deprecated(da_setConst_dep_msg)
-    def setConst(self, const=True, value=None):
-        """This function has been deprecated and will be removed in
-        version 4.0.0.
-
-        Please use
-        diffpy.cmistructure.objcryst.ObjCrystDihedralAngleParameter.set_constant
-        instead.
-        """
-        self.set_constant(const, value)
         return self
 
     def get_value(self):

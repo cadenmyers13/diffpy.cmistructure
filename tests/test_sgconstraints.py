@@ -14,7 +14,6 @@
 ##############################################################################
 """Tests space group constraints."""
 
-import re
 import unittest
 
 import numpy
@@ -198,42 +197,6 @@ def test_constrain_as_space_group_args(pyobjcryst_available, datafile):
     list(sgpars)
     list(sgpars2)
     assert sgpars.names == sgpars2.names
-    return
-
-
-# ----------------------------------------------------------------------------
-# constrainAsSpaceGroup is deprecated in favor of constrain_as_space_group.
-# The old name must still work, emit a DeprecationWarning naming its
-# replacement, and forward to the new implementation.
-
-
-def test_constrainAsSpaceGroup_warns_and_forwards(
-    pyobjcryst_available, datafile
-):
-    if not pyobjcryst_available:
-        pytest.skip("pyobjcrysta package not available")
-
-    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
-    from diffpy.cmistructure.sgconstraints import (
-        constrain_as_space_group,
-        constrainAsSpaceGroup,
-    )
-
-    module_path = "diffpy.cmistructure.sgconstraints"
-    expected_msg = (
-        f"'{module_path}.constrainAsSpaceGroup' is deprecated and will be "
-        f"removed in version 4.0.0. Please use "
-        f"'{module_path}.constrain_as_space_group' instead."
-    )
-
-    parset = DiffpyStructureParSet("LaMnO3", makeLaMnO3_P1(datafile))
-    with pytest.warns(DeprecationWarning, match=re.escape(expected_msg)):
-        actual_sgpars = constrainAsSpaceGroup(parset, "P b n m")
-
-    parset2 = DiffpyStructureParSet("LMO", makeLaMnO3_P1(datafile))
-    expected_sgpars = constrain_as_space_group(parset2, "P b n m")
-
-    assert actual_sgpars.names == expected_sgpars.names
     return
 
 

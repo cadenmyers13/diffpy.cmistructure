@@ -16,19 +16,12 @@
 ParameterSet interface and automatic structure constraint generation
 from space group information."""
 
-from diffpy.cmistructure.sgconstraints import (
-    constrain_as_space_group,
-    constrainAsSpaceGroup,
-)
+from diffpy.cmistructure.sgconstraints import constrain_as_space_group
 
 # package version
 from diffpy.cmistructure.version import __version__  # noqa
 
-__all__ = [
-    "constrain_as_space_group",
-    "constrainAsSpaceGroup",
-    "struToParameterSet",
-]
+__all__ = ["constrain_as_space_group", "struToParameterSet"]
 
 
 def struToParameterSet(name, stru):
