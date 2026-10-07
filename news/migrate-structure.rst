@@ -1,6 +1,6 @@
 **Added:**
 
-* Add the structure adapters and space group constraints migrated from ``diffpy.srfit.structure``.
+* No news added.
 
 **Changed:**
 
@@ -16,7 +16,7 @@
 
 **Fixed:**
 
-* Fix the ``diffpy-cmistructure`` entry point to point at ``cmistructure_app``.
+* <news item>
 
 **Security:**
 
