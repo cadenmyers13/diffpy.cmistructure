@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 ##############################################################################
 #
-# diffpy.srfit      by DANSE Diffraction group
-#                   Simon J. L. Billinge
-#                   (c) 2009 The Trustees of Columbia University
-#                   in the City of New York.  All rights reserved.
+# (c) 2009 The Trustees of Columbia University in the City of New York.
+# (c) 2026 Contributors to diffpy.cmistructure.
+# All rights reserved.
 #
-# File coded by:    Chris Farrow
+# File coded by: Chris Farrow and members of the diffpy community.
 #
-# See AUTHORS.txt for a list of people who contributed.
-# See LICENSE_DANSE.txt for license information.
+# Originally developed in diffpy.srfit by the DANSE Diffraction group and
+# Simon J. L. Billinge.
+#
+# See GitHub contributions for a more detailed list of contributors.
+# https://github.com/diffpy/diffpy.cmistructure/graphs/contributors
+#
+# See LICENSE.rst and LICENSE_DANSE.rst for license information.
 #
 ##############################################################################
 """Wrappers for adapting pyobjcryst.crystal.Crystal to a srfit
