@@ -37,48 +37,78 @@ def testDiffpyStructureParSet():
 
     s = DiffpyStructureParSet("CuAg", dsstru)
 
-    assert s.name == "CuAg"
+    actual_name = s.name
+    expected_name = "CuAg"
+    assert actual_name == expected_name
 
     def _testAtoms():
         # Check the atoms thoroughly
-        assert a1.element == s.Cu0.element
-        assert a2.element == s.Ag0.element
-        assert a1.Uisoequiv == s.Cu0.Uiso.get_value()
-        assert a2.Uisoequiv == s.Ag0.Uiso.get_value()
-        assert a1.Bisoequiv == s.Cu0.Biso.get_value()
-        assert a2.Bisoequiv == s.Ag0.Biso.get_value()
+        actual_atoms = {
+            "Cu0": {
+                "element": s.Cu0.element,
+                "Uiso": s.Cu0.Uiso.get_value(),
+                "Biso": s.Cu0.Biso.get_value(),
+                "xyz": [
+                    s.Cu0.x.get_value(),
+                    s.Cu0.y.get_value(),
+                    s.Cu0.z.get_value(),
+                ],
+            },
+            "Ag0": {
+                "element": s.Ag0.element,
+                "Uiso": s.Ag0.Uiso.get_value(),
+                "Biso": s.Ag0.Biso.get_value(),
+            },
+        }
+        expected_atoms = {
+            "Cu0": {
+                "element": a1.element,
+                "Uiso": a1.Uisoequiv,
+                "Biso": a1.Bisoequiv,
+                "xyz": [a1.xyz[0], a1.xyz[1], a1.xyz[2]],
+            },
+            "Ag0": {
+                "element": a2.element,
+                "Uiso": a2.Uisoequiv,
+                "Biso": a2.Bisoequiv,
+            },
+        }
+        assert actual_atoms == expected_atoms
+
+        # The Uij and Uji (Bij and Bji) Parameters both read the
+        # structure's Uij (Bij).
+        actual_anisotropic = {}
+        expected_anisotropic = {}
         for i in range(1, 4):
             for j in range(i, 4):
-                uijstru = getattr(a1, "U%i%i" % (i, j))
-                uij = getattr(s.Cu0, "U%i%i" % (i, j)).get_value()
-                uji = getattr(s.Cu0, "U%i%i" % (j, i)).get_value()
-                assert uijstru == uij
-                assert uijstru == uji
-                bijstru = getattr(a1, "B%i%i" % (i, j))
-                bij = getattr(s.Cu0, "B%i%i" % (i, j)).get_value()
-                bji = getattr(s.Cu0, "B%i%i" % (j, i)).get_value()
-                assert bijstru == bij
-                assert bijstru == bji
-
-        assert a1.xyz[0] == s.Cu0.x.get_value()
-        assert a1.xyz[1] == s.Cu0.y.get_value()
-        assert a1.xyz[2] == s.Cu0.z.get_value()
+                for prefix in "UB":
+                    ij = "%s%i%i" % (prefix, i, j)
+                    ji = "%s%i%i" % (prefix, j, i)
+                    actual_anisotropic[ij] = getattr(s.Cu0, ij).get_value()
+                    actual_anisotropic[ji] = getattr(s.Cu0, ji).get_value()
+                    expected_anisotropic[ij] = getattr(a1, ij)
+                    expected_anisotropic[ji] = getattr(a1, ij)
+        assert actual_anisotropic == expected_anisotropic
         return
 
     def _testLattice():
-
         # Test the lattice
-        assert dsstru.lattice.a == s.lattice.a.get_value()
-        assert dsstru.lattice.b == s.lattice.b.get_value()
-        assert dsstru.lattice.c == s.lattice.c.get_value()
-        assert dsstru.lattice.alpha == s.lattice.alpha.get_value()
-        assert dsstru.lattice.beta == s.lattice.beta.get_value()
-        assert dsstru.lattice.gamma == s.lattice.gamma.get_value()
+        lattice_names = ["a", "b", "c", "alpha", "beta", "gamma"]
+        actual_lattice = [
+            getattr(s.lattice, name).get_value() for name in lattice_names
+        ]
+        expected_lattice = [
+            getattr(dsstru.lattice, name) for name in lattice_names
+        ]
+        assert actual_lattice == expected_lattice
 
+    # C1: The ParameterSet has just been created from the structure.
+    # Expected: The Parameters match the atoms and lattice.
     _testAtoms()
     _testLattice()
 
-    # Now change some values from the diffpy Structure
+    # C2: The diffpy Structure is changed directly.
+    # Expected: The Parameters follow the changes.
     a1.xyz[1] = 0.123
     a1.U11 = 0.321
     a1.B32 = 0.111
@@ -86,7 +116,9 @@ def testDiffpyStructureParSet():
     _testAtoms()
     _testLattice()
 
-    # Now change values from the srfit DiffpyStructureParSet
+    # C3: The Parameters of the DiffpyStructureParSet are changed.
+    # Expected: The structure follows the changes, so the distance
+    # between the atoms changes.
     s.Cu0.x.set_value(0.456)
     s.Cu0.U22.set_value(0.441)
     s.Cu0.B13.set_value(0.550)
@@ -95,8 +127,9 @@ def testDiffpyStructureParSet():
     s.lattice.alpha.set_value(91.3)
     _testAtoms()
     _testLattice()
-    # Make sure the distance changed
-    assert d != dsstru.lattice.dist(a1.xyz, a2.xyz)
+    actual_distance_changed = d != dsstru.lattice.dist(a1.xyz, a2.xyz)
+    expected_distance_changed = True
+    assert actual_distance_changed == expected_distance_changed
     return
 
 
@@ -108,9 +141,11 @@ def test___repr__():
     atom = Atom("C", [0, 0.2, 0.5])
     structure = Structure([atom], lattice=lat)
     dsps = DiffpyStructureParSet("dsps", structure)
-    assert repr(structure) == repr(dsps)
-    assert repr(lat) == repr(dsps.lattice)
-    assert repr(atom) == repr(dsps.atoms[0])
+    # C1: The structure, lattice and atom ParameterSets are printed.
+    # Expected: Each repr matches the repr of the adapted object.
+    actual_reprs = [repr(dsps), repr(dsps.lattice), repr(dsps.atoms[0])]
+    expected_reprs = [repr(structure), repr(lat), repr(atom)]
+    assert actual_reprs == expected_reprs
     return
 
 
@@ -122,8 +157,14 @@ def test_pickling():
     dsps = DiffpyStructureParSet("dsps", structure)
     data = pickle.dumps(dsps)
     dsps2 = pickle.loads(data)
-    assert 1 == len(dsps2.atoms)
-    assert 0.2 == dsps2.atoms[0].y.value
+    # C1: A DiffpyStructureParSet is pickled and unpickled.
+    # Expected: The copy keeps its single atom and the atom's position.
+    actual_atom_count = len(dsps2.atoms)
+    expected_atom_count = 1
+    assert actual_atom_count == expected_atom_count
+    actual_y = dsps2.atoms[0].y.value
+    expected_y = 0.2
+    assert actual_y == expected_y
     return
 
 

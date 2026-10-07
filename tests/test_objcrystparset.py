@@ -147,15 +147,21 @@ class TestParameterAdapter:
         m = crystal.c60
         m.wrap_restraints()
 
-        # make sure that we have some restraints in the molecule
-        assert 2 == len(m._restraints)
+        # C1: Two restraints are added to the molecule.
+        # Expected: The molecule holds both restraints.
+        actual_restraint_count = len(m._restraints)
+        expected_restraint_count = 2
+        assert actual_restraint_count == expected_restraint_count
 
-        # make sure these evaluate to whatver we get from objcryst
+        # C2: The restraint penalties are evaluated.
+        # Expected: They equal the pyobjcryst log-likelihoods.
         res0, res1 = m._restraints
-        p0 = set([res0.penalty(), res1.penalty()])
+        actual_penalties = set([res0.penalty(), res1.penalty()])
         angles = ocmol.GetBondAngleList()
-        p1 = set([angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()])
-        assert p0 == p1
+        expected_penalties = set(
+            [angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()]
+        )
+        assert actual_penalties == expected_penalties
 
         return
 
@@ -166,49 +172,94 @@ class TestParameterAdapter:
         crystal = ObjCrystCrystalParSet("bucky", occryst)
         m = crystal.c60
 
-        assert crystal.name == "bucky"
+        actual_name = crystal.name
+        expected_name = "bucky"
+        assert actual_name == expected_name
 
         def _testCrystal():
             # Test the lattice
-            assert occryst.a == pytest.approx(crystal.a.value)
-            assert occryst.b == pytest.approx(crystal.b.get_value())
-            assert occryst.c == pytest.approx(crystal.c.get_value())
-            assert occryst.alpha == pytest.approx(crystal.alpha.get_value())
-            assert occryst.beta == pytest.approx(crystal.beta.get_value())
-            assert occryst.gamma == pytest.approx(crystal.gamma.get_value())
+            actual_lattice = [
+                crystal.a.value,
+                crystal.b.get_value(),
+                crystal.c.get_value(),
+                crystal.alpha.get_value(),
+                crystal.beta.get_value(),
+                crystal.gamma.get_value(),
+            ]
+            expected_lattice = [
+                occryst.a,
+                occryst.b,
+                occryst.c,
+                occryst.alpha,
+                occryst.beta,
+                occryst.gamma,
+            ]
+            assert actual_lattice == pytest.approx(expected_lattice)
             return
 
         def _testMolecule():
-
-            # Test position / occupancy
-            assert ocmol.X == pytest.approx(m.x.get_value())
-            assert ocmol.Y == pytest.approx(m.y.get_value())
-            assert ocmol.Z == pytest.approx(m.z.get_value())
-            assert ocmol.Occupancy == pytest.approx(m.occ.get_value())
-
-            # Test orientation
-            assert ocmol.Q0 == pytest.approx(m.q0.get_value())
-            assert ocmol.Q1 == pytest.approx(m.q1.get_value())
-            assert ocmol.Q2 == pytest.approx(m.q2.get_value())
-            assert ocmol.Q3 == pytest.approx(m.q3.get_value())
+            # Test position, occupancy and orientation
+            actual_molecule = [
+                m.x.get_value(),
+                m.y.get_value(),
+                m.z.get_value(),
+                m.occ.get_value(),
+                m.q0.get_value(),
+                m.q1.get_value(),
+                m.q2.get_value(),
+                m.q3.get_value(),
+            ]
+            expected_molecule = [
+                ocmol.X,
+                ocmol.Y,
+                ocmol.Z,
+                ocmol.Occupancy,
+                ocmol.Q0,
+                ocmol.Q1,
+                ocmol.Q2,
+                ocmol.Q3,
+            ]
+            assert actual_molecule == pytest.approx(expected_molecule)
 
             # Check the atoms thoroughly
-            for i in range(len(ocmol)):
-                oca = ocmol[i]
-                ocsp = oca.GetScatteringPower()
-                a = m.atoms[i]
-                assert ocsp.GetSymbol() == a.element
-                assert oca.X == pytest.approx(a.x.get_value())
-                assert oca.Y == pytest.approx(a.y.get_value())
-                assert oca.Z == pytest.approx(a.z.get_value())
-                assert oca.Occupancy == pytest.approx(a.occ.get_value())
-                assert ocsp.Biso == pytest.approx(a.Biso.get_value())
+            actual_elements = [a.element for a in m.atoms]
+            expected_elements = [
+                ocmol[i].GetScatteringPower().GetSymbol()
+                for i in range(len(ocmol))
+            ]
+            assert actual_elements == expected_elements
+            actual_atoms = [
+                [
+                    a.x.get_value(),
+                    a.y.get_value(),
+                    a.z.get_value(),
+                    a.occ.get_value(),
+                    a.Biso.get_value(),
+                ]
+                for a in m.atoms
+            ]
+            expected_atoms = [
+                pytest.approx(
+                    [
+                        ocmol[i].X,
+                        ocmol[i].Y,
+                        ocmol[i].Z,
+                        ocmol[i].Occupancy,
+                        ocmol[i].GetScatteringPower().Biso,
+                    ]
+                )
+                for i in range(len(ocmol))
+            ]
+            assert actual_atoms == expected_atoms
             return
 
+        # C1: The ParameterSet has just been created from the crystal.
+        # Expected: The Parameters match the pyobjcryst values.
         _testCrystal()
         _testMolecule()
 
-        # Now change some values from ObjCryst
+        # C2: Values are changed through pyobjcryst.
+        # Expected: The Parameters follow the changes.
         ocmol[0].X *= 1.1
         ocmol[0].Occupancy *= 1.1
         ocmol[0].GetScatteringPower().Biso *= 1.1
@@ -218,7 +269,8 @@ class TestParameterAdapter:
         _testCrystal()
         _testMolecule()
 
-        # Now change values from the srfit StructureParSet
+        # C3: Values are changed through the ParameterSet.
+        # Expected: The pyobjcryst objects follow the changes.
         crystal.c60.C44.x.set_value(1.1)
         crystal.c60.C44.occ.set_value(1.1)
         crystal.c60.C44.Biso.set_value(1.1)
@@ -243,15 +295,21 @@ class TestParameterAdapter:
         m = crystal.c60
         m.wrap_restraints()
 
-        # make sure that we have some restraints in the molecule
-        assert 2 == len(m._restraints)
+        # C1: Two restraints are added to the molecule.
+        # Expected: The molecule holds both restraints.
+        actual_restraint_count = len(m._restraints)
+        expected_restraint_count = 2
+        assert actual_restraint_count == expected_restraint_count
 
-        # make sure these evaluate to whatver we get from objcryst
+        # C2: The restraint penalties are evaluated.
+        # Expected: They equal the pyobjcryst log-likelihoods.
         res0, res1 = m._restraints
-        p0 = set([res0.penalty(), res1.penalty()])
+        actual_penalties = set([res0.penalty(), res1.penalty()])
         bonds = ocmol.GetBondList()
-        p1 = set([bonds[0].GetLogLikelihood(), bonds[1].GetLogLikelihood()])
-        assert p0 == p1
+        expected_penalties = set(
+            [bonds[0].GetLogLikelihood(), bonds[1].GetLogLikelihood()]
+        )
+        assert actual_penalties == expected_penalties
 
         return
 
@@ -273,15 +331,21 @@ class TestParameterAdapter:
         m = crystal.c60
         m.wrap_restraints()
 
-        # make sure that we have some restraints in the molecule
-        assert 2 == len(m._restraints)
+        # C1: Two restraints are added to the molecule.
+        # Expected: The molecule holds both restraints.
+        actual_restraint_count = len(m._restraints)
+        expected_restraint_count = 2
+        assert actual_restraint_count == expected_restraint_count
 
-        # make sure these evaluate to whatver we get from objcryst
+        # C2: The restraint penalties are evaluated.
+        # Expected: They equal the pyobjcryst log-likelihoods.
         res0, res1 = m._restraints
-        p0 = set([res0.penalty(), res1.penalty()])
+        actual_penalties = set([res0.penalty(), res1.penalty()])
         angles = ocmol.GetDihedralAngleList()
-        p1 = set([angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()])
-        assert p0 == p1
+        expected_penalties = set(
+            [angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()]
+        )
+        assert actual_penalties == expected_penalties
 
         return
 
@@ -303,15 +367,21 @@ class TestParameterAdapter:
         res0 = m.restrain_bond_length(m.atoms[0], m.atoms[5], 3.3, 0.1, 0.1)
         res1 = m.restrain_bond_length(m.atoms[0], m.atoms[7], 3.3, 0.1, 0.1)
 
-        # make sure that we have some restraints in the molecule
-        assert 2 == len(m._restraints)
+        # C1: Two restraints are added to the molecule.
+        # Expected: The molecule holds both restraints.
+        actual_restraint_count = len(m._restraints)
+        expected_restraint_count = 2
+        assert actual_restraint_count == expected_restraint_count
 
-        # make sure these evaluate to whatver we get from objcryst
-        p0 = [res0.penalty(), res1.penalty()]
+        # C2: The restraint penalties are evaluated.
+        # Expected: They equal the pyobjcryst log-likelihoods.
         bonds = ocmol.GetBondList()
-        assert 2 == len(bonds)
-        p1 = [b.GetLogLikelihood() for b in bonds]
-        assert p0 == p1
+        actual_bond_count = len(bonds)
+        expected_bond_count = 2
+        assert actual_bond_count == expected_bond_count
+        actual_penalties = [res0.penalty(), res1.penalty()]
+        expected_penalties = [b.GetLogLikelihood() for b in bonds]
+        assert actual_penalties == expected_penalties
 
         return
 
@@ -336,14 +406,20 @@ class TestParameterAdapter:
             m.atoms[0], m.atoms[7], m.atoms[44], 3.3, 0.1, 0.1
         )
 
-        # make sure that we have some restraints in the molecule
-        assert 2 == len(m._restraints)
+        # C1: Two restraints are added to the molecule.
+        # Expected: The molecule holds both restraints.
+        actual_restraint_count = len(m._restraints)
+        expected_restraint_count = 2
+        assert actual_restraint_count == expected_restraint_count
 
-        # make sure these evaluate to whatver we get from objcryst
-        p0 = set([res0.penalty(), res1.penalty()])
+        # C2: The restraint penalties are evaluated.
+        # Expected: They equal the pyobjcryst log-likelihoods.
+        actual_penalties = set([res0.penalty(), res1.penalty()])
         angles = ocmol.GetBondAngleList()
-        p1 = set([angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()])
-        assert p0 == p1
+        expected_penalties = set(
+            [angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()]
+        )
+        assert actual_penalties == expected_penalties
 
         return
 
@@ -364,14 +440,20 @@ class TestParameterAdapter:
             m.atoms[0], m.atoms[7], m.atoms[44], m.atoms[2], 1.1, 0.1, 0.1
         )
 
-        # make sure that we have some restraints in the molecule
-        assert 2 == len(m._restraints)
+        # C1: Two restraints are added to the molecule.
+        # Expected: The molecule holds both restraints.
+        actual_restraint_count = len(m._restraints)
+        expected_restraint_count = 2
+        assert actual_restraint_count == expected_restraint_count
 
-        # make sure these evaluate to whatver we get from objcryst
-        p0 = set([res0.penalty(), res1.penalty()])
+        # C2: The restraint penalties are evaluated.
+        # Expected: They equal the pyobjcryst log-likelihoods.
+        actual_penalties = set([res0.penalty(), res1.penalty()])
         angles = ocmol.GetDihedralAngleList()
-        p1 = set([angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()])
-        assert p0 == p1
+        expected_penalties = set(
+            [angles[0].GetLogLikelihood(), angles[1].GetLogLikelihood()]
+        )
+        assert actual_penalties == expected_penalties
 
         return
 
@@ -404,17 +486,25 @@ class TestParameterAdapter:
 
         dd = xyz0 - xyz7
         d0 = numpy.dot(dd, dd) ** 0.5
-        assert d0 == pytest.approx(p1.get_value(), abs=1e-6)
+        # C1: A bond length Parameter is added.
+        # Expected: Its value is the current bond length.
+        actual_length = p1.get_value()
+        expected_length = d0
+        assert actual_length == pytest.approx(expected_length, abs=1e-6)
 
         # Record the unit direction of change for later
         u = dd / d0
 
-        # Change the value
+        # C2: The bond length Parameter is stretched by 5%.
+        # Expected: The Parameter and the measured bond length both take
+        # the new value, the first atom stays put, and the second and
+        # tag-along atoms move along the bond.
         scale = 1.05
         p1.set_value(scale * d0)
 
-        # Verify that it has changed.
-        assert scale * d0 == pytest.approx(p1.get_value(), abs=1e-6)
+        actual_length = p1.get_value()
+        expected_length = scale * d0
+        assert actual_length == pytest.approx(expected_length, abs=1e-6)
 
         xyz0a = numpy.array(
             [a0.x.get_value(), a0.y.get_value(), a0.z.get_value()]
@@ -429,19 +519,23 @@ class TestParameterAdapter:
         dda = xyz0a - xyz7a
         d1 = numpy.dot(dda, dda) ** 0.5
 
-        assert scale * d0 == pytest.approx(d1, abs=1e-6)
+        actual_measured_length = d1
+        expected_measured_length = scale * d0
+        assert actual_measured_length == pytest.approx(
+            expected_measured_length, abs=1e-6
+        )
 
-        # Verify that only the second and third atoms have moved.
+        actual_xyz0 = xyz0a.tolist()
+        expected_xyz0 = xyz0.tolist()
+        assert actual_xyz0 == expected_xyz0
 
-        assert numpy.array_equal(xyz0, xyz0a)
+        actual_xyz7 = xyz7a
+        expected_xyz7 = xyz7 + (1 - scale) * d0 * u
+        assert actual_xyz7 == pytest.approx(expected_xyz7, abs=1e-5)
 
-        xyz7calc = xyz7 + (1 - scale) * d0 * u
-        for i in range(3):
-            assert xyz7a[i] == pytest.approx(xyz7calc[i], abs=1e-5)
-
-        xyz20calc = xyz20 + (1 - scale) * d0 * u
-        for i in range(3):
-            assert xyz20a[i] == pytest.approx(xyz20calc[i], abs=1e-6)
+        actual_xyz20 = xyz20a
+        expected_xyz20 = xyz20 + (1 - scale) * d0 * u
+        assert actual_xyz20 == pytest.approx(expected_xyz20, abs=1e-6)
 
         return
 
@@ -483,14 +577,21 @@ class TestParameterAdapter:
         # Have another atom tag along for the ride
         p1.add_atoms([a25])
 
-        assert angle0 == pytest.approx(p1.get_value(), abs=1e-6)
+        # C1: A bond angle Parameter is added.
+        # Expected: Its value is the current bond angle.
+        actual_angle = p1.get_value()
+        expected_angle = angle0
+        assert actual_angle == pytest.approx(expected_angle, abs=1e-6)
 
-        # Change the value
+        # C2: The bond angle Parameter is stretched by 5%.
+        # Expected: The Parameter and the measured angle both take the new
+        # value, and only the third and tag-along atoms move.
         scale = 1.05
         p1.set_value(scale * angle0)
 
-        # Verify that it has changed.
-        assert scale * angle0 == pytest.approx(p1.get_value(), abs=1e-6)
+        actual_angle = p1.get_value()
+        expected_angle = scale * angle0
+        assert actual_angle == pytest.approx(expected_angle, abs=1e-6)
 
         xyz0a = numpy.array(
             [a0.x.get_value(), a0.y.get_value(), a0.z.get_value()]
@@ -512,14 +613,20 @@ class TestParameterAdapter:
 
         angle1 = numpy.arccos(numpy.dot(v1a, v2a) / (d1a * d2a))
 
-        assert scale * angle0 == pytest.approx(angle1, abs=1e-6)
+        actual_measured_angle = angle1
+        expected_measured_angle = scale * angle0
+        assert actual_measured_angle == pytest.approx(
+            expected_measured_angle, abs=1e-6
+        )
 
-        # Verify that only the last two atoms have moved.
-
-        assert numpy.array_equal(xyz0, xyz0a)
-        assert numpy.array_equal(xyz7, xyz7a)
-        assert not numpy.array_equal(xyz20, xyz20a)
-        assert not numpy.array_equal(xyz25, xyz25a)
+        actual_moved = {
+            "C0": not numpy.array_equal(xyz0, xyz0a),
+            "C7": not numpy.array_equal(xyz7, xyz7a),
+            "C20": not numpy.array_equal(xyz20, xyz20a),
+            "C25": not numpy.array_equal(xyz25, xyz25a),
+        }
+        expected_moved = {"C0": False, "C7": False, "C20": True, "C25": True}
+        assert actual_moved == expected_moved
 
         return
 
@@ -568,14 +675,21 @@ class TestParameterAdapter:
         # Have another atom tag along for the ride
         p1.add_atoms([a33])
 
-        assert angle0 == pytest.approx(p1.get_value(), abs=1e-6)
+        # C1: A dihedral angle Parameter is added.
+        # Expected: Its value is the current dihedral angle.
+        actual_angle = p1.get_value()
+        expected_angle = angle0
+        assert actual_angle == pytest.approx(expected_angle, abs=1e-6)
 
-        # Change the value
+        # C2: The dihedral angle Parameter is stretched by 5%.
+        # Expected: The Parameter and the measured angle both take the new
+        # value, and only the fourth and tag-along atoms move.
         scale = 1.05
         p1.set_value(scale * angle0)
 
-        # Verify that it has changed.
-        assert scale * angle0 == pytest.approx(p1.get_value(), abs=1e-6)
+        actual_angle = p1.get_value()
+        expected_angle = scale * angle0
+        assert actual_angle == pytest.approx(expected_angle, abs=1e-6)
 
         xyz0a = numpy.array(
             [a0.x.get_value(), a0.y.get_value(), a0.z.get_value()]
@@ -602,15 +716,27 @@ class TestParameterAdapter:
         d123a = numpy.dot(v123a, v123a) ** 0.5
         d234a = numpy.dot(v234a, v234a) ** 0.5
         angle1 = -numpy.arccos(numpy.dot(v123a, v234a) / (d123a * d234a))
-        assert scale * angle0 == pytest.approx(angle1, abs=1e-6)
+        actual_measured_angle = angle1
+        expected_measured_angle = scale * angle0
+        assert actual_measured_angle == pytest.approx(
+            expected_measured_angle, abs=1e-6
+        )
 
-        # Verify that only the last two atoms have moved.
-
-        assert numpy.array_equal(xyz0, xyz0a)
-        assert numpy.array_equal(xyz7, xyz7a)
-        assert numpy.array_equal(xyz20, xyz20a)
-        assert not numpy.array_equal(xyz25, xyz25a)
-        assert not numpy.array_equal(xyz33, xyz33a)
+        actual_moved = {
+            "C0": not numpy.array_equal(xyz0, xyz0a),
+            "C7": not numpy.array_equal(xyz7, xyz7a),
+            "C20": not numpy.array_equal(xyz20, xyz20a),
+            "C25": not numpy.array_equal(xyz25, xyz25a),
+            "C33": not numpy.array_equal(xyz33, xyz33a),
+        }
+        expected_moved = {
+            "C0": False,
+            "C7": False,
+            "C20": False,
+            "C25": True,
+            "C33": True,
+        }
+        assert actual_moved == expected_moved
 
         return
 
@@ -665,8 +791,9 @@ class TestCreateSpaceGroup:
             if spacegroups.IsSpaceGroupIdentifier(short_name):
                 space_group = spacegroups.GetSpaceGroup(shn)
                 sgnew = self.getObjCrystParSetSpaceGroup(space_group)
-                # print("dbsg: " + repr(self.sgsEquivalent(sg, sgnew)))
-                assert self.sgsEquivalent(space_group, sgnew)
+                actual_equivalent = self.sgsEquivalent(space_group, sgnew)
+                expected_equivalent = True
+                assert actual_equivalent == expected_equivalent
         return
 
 
