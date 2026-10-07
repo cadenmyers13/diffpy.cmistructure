@@ -27,13 +27,13 @@ def test_ObjCryst_constrain_space_group(pyobjcryst_available):
     """Make sure that all Parameters are constrained properly.
 
     This tests constrainSpaceGroup from
-    diffpy.srfit.structure.sgconstraints, which is performed
-    automatically when an ObjCrystCrystalParSet is created.
+    diffpy.cmistructure.sgconstraints, which is performed automatically
+    when an ObjCrystCrystalParSet is created.
     """
     if not pyobjcryst_available:
         pytest.skip("pyobjcrysta package not available")
 
-    from diffpy.srfit.structure.objcrystparset import ObjCrystCrystalParSet
+    from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
 
     pi = numpy.pi
 
@@ -111,8 +111,8 @@ def test_DiffPy_constrain_as_space_group(datafile, pyobjcryst_available):
     if not pyobjcryst_available:
         pytest.skip("pyobjcrysta package not available")
 
-    from diffpy.srfit.structure.diffpyparset import DiffpyStructureParSet
-    from diffpy.srfit.structure.sgconstraints import constrain_as_space_group
+    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
+    from diffpy.cmistructure.sgconstraints import constrain_as_space_group
 
     stru = makeLaMnO3_P1(datafile)
     parset = DiffpyStructureParSet("LaMnO3", stru)
@@ -185,8 +185,8 @@ def test_constrain_as_space_group_args(pyobjcryst_available, datafile):
     if not pyobjcryst_available:
         pytest.skip("pyobjcrysta package not available")
 
-    from diffpy.srfit.structure.diffpyparset import DiffpyStructureParSet
-    from diffpy.srfit.structure.sgconstraints import constrain_as_space_group
+    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
+    from diffpy.cmistructure.sgconstraints import constrain_as_space_group
     from diffpy.structure.spacegroups import GetSpaceGroup
 
     stru = makeLaMnO3_P1(datafile)
@@ -213,13 +213,13 @@ def test_constrainAsSpaceGroup_warns_and_forwards(
     if not pyobjcryst_available:
         pytest.skip("pyobjcrysta package not available")
 
-    from diffpy.srfit.structure.diffpyparset import DiffpyStructureParSet
-    from diffpy.srfit.structure.sgconstraints import (
+    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
+    from diffpy.cmistructure.sgconstraints import (
         constrain_as_space_group,
         constrainAsSpaceGroup,
     )
 
-    module_path = "diffpy.srfit.structure.sgconstraints"
+    module_path = "diffpy.cmistructure.sgconstraints"
     expected_msg = (
         f"'{module_path}.constrainAsSpaceGroup' is deprecated and will be "
         f"removed in version 4.0.0. Please use "

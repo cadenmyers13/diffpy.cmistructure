@@ -51,17 +51,17 @@ from pyobjcryst.molecule import (
     StretchModeTorsion,
 )
 
+from diffpy.cmistructure.srrealparset import SrRealParSet
 from diffpy.srfit.fitbase.parameter import (
     Parameter,
     ParameterAdapter,
     ParameterProxy,
 )
 from diffpy.srfit.fitbase.parameterset import ParameterSet
-from diffpy.srfit.structure.srrealparset import SrRealParSet
 from diffpy.utils._deprecator import build_deprecation_message, deprecated
 
 removal_version = "4.0.0"
-bl_base = "diffpy.srfit.structure.objcrystparset.ObjCrystBondLengthParameter"
+bl_base = "diffpy.cmistructure.objcrystparset.ObjCrystBondLengthParameter"
 
 bl_setConst_dep_msg = build_deprecation_message(
     bl_base,
@@ -70,7 +70,7 @@ bl_setConst_dep_msg = build_deprecation_message(
     removal_version,
 )
 
-ba_base = "diffpy.srfit.structure.objcrystparset.ObjCrystBondAngleParameter"
+ba_base = "diffpy.cmistructure.objcrystparset.ObjCrystBondAngleParameter"
 
 ba_setConst_dep_msg = build_deprecation_message(
     ba_base,
@@ -79,9 +79,7 @@ ba_setConst_dep_msg = build_deprecation_message(
     removal_version,
 )
 
-da_base = (
-    "diffpy.srfit.structure.objcrystparset.ObjCrystDihedralAngleParameter"
-)
+da_base = "diffpy.cmistructure.objcrystparset.ObjCrystDihedralAngleParameter"
 
 da_setConst_dep_msg = build_deprecation_message(
     da_base,
@@ -1400,7 +1398,7 @@ class ObjCrystBondLengthParameter(StretchModeParameter):
         4.0.0.
 
         Please use
-        diffpy.srfit.structure.objcryst.ObjCrystBondLengthParameter.set_constant
+        diffpy.cmistructure.objcryst.ObjCrystBondLengthParameter.set_constant
         instead.
         """
         self.set_constant(const, value)
@@ -1561,7 +1559,7 @@ class ObjCrystBondAngleParameter(StretchModeParameter):
         version 4.0.0.
 
         Please use
-        diffpy.srfit.structure.objcryst.ObjCrystBondAngleParameter.set_constant
+        diffpy.cmistructure.objcryst.ObjCrystBondAngleParameter.set_constant
         instead.
         """
         self.set_constant(const, value)
@@ -1741,7 +1739,7 @@ class ObjCrystDihedralAngleParameter(StretchModeParameter):
         version 4.0.0.
 
         Please use
-        diffpy.srfit.structure.objcryst.ObjCrystDihedralAngleParameter.set_constant
+        diffpy.cmistructure.objcryst.ObjCrystDihedralAngleParameter.set_constant
         instead.
         """
         self.set_constant(const, value)
@@ -1785,7 +1783,7 @@ class ObjCrystCrystalParSet(SrRealParSet):
         convenience.
     _sgpars
         A BaseSpaceGroupParameters object containing free structure
-        Parameters. See the diffpy.srfit.structure.sgconstraints
+        Parameters. See the diffpy.cmistructure.sgconstraints
         module.
     sgpars
         property that creates _sgpars when it is needed.
@@ -1859,7 +1857,7 @@ class ObjCrystCrystalParSet(SrRealParSet):
         if self._sgpars is not None:
             return self._sgpars
         sg = self._create_space_group(self.stru.GetSpaceGroup())
-        from diffpy.srfit.structure.sgconstraints import (
+        from diffpy.cmistructure.sgconstraints import (
             _constrain_as_space_group,
         )
 

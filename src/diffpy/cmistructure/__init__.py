@@ -1,25 +1,34 @@
 #!/usr/bin/env python
 ##############################################################################
 #
-# diffpy.srfit      by DANSE Diffraction group
-#                   Simon J. L. Billinge
-#                   (c) 2009 The Trustees of Columbia University
-#                   in the City of New York.  All rights reserved.
+# (c) 2026 Contributors to diffpy.cmistructure.
+# All rights reserved.
 #
-# File coded by:    Chris Farrow
+# File coded by: Members of the diffpy community.
 #
-# See AUTHORS.txt for a list of people who contributed.
-# See LICENSE_DANSE.txt for license information.
+# See GitHub contributions for a more detailed list of contributors.
+# https://github.com/diffpy/diffpy.cmistructure/graphs/contributors
+#
+# See LICENSE.rst for license information.
 #
 ##############################################################################
 """Modules and classes that adapt structure representations to the
 ParameterSet interface and automatic structure constraint generation
 from space group information."""
 
-from diffpy.srfit.structure.sgconstraints import (
+from diffpy.cmistructure.sgconstraints import (
     constrain_as_space_group,
     constrainAsSpaceGroup,
 )
+
+# package version
+from diffpy.cmistructure.version import __version__  # noqa
+
+__all__ = [
+    "constrain_as_space_group",
+    "constrainAsSpaceGroup",
+    "struToParameterSet",
+]
 
 
 def struToParameterSet(name, stru):
@@ -37,22 +46,22 @@ def struToParameterSet(name, stru):
 
     Raises TypeError if stru cannot be adapted
     """
-    from diffpy.srfit.structure.diffpyparset import DiffpyStructureParSet
+    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
 
     if DiffpyStructureParSet.canAdapt(stru):
         return DiffpyStructureParSet(name, stru)
 
-    from diffpy.srfit.structure.objcrystparset import ObjCrystCrystalParSet
+    from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
 
     if ObjCrystCrystalParSet.canAdapt(stru):
         return ObjCrystCrystalParSet(name, stru)
 
-    from diffpy.srfit.structure.objcrystparset import ObjCrystMoleculeParSet
+    from diffpy.cmistructure.objcrystparset import ObjCrystMoleculeParSet
 
     if ObjCrystMoleculeParSet.canAdapt(stru):
         return ObjCrystMoleculeParSet(name, stru)
 
-    from diffpy.srfit.structure.cctbxparset import CCTBXCrystalParSet
+    from diffpy.cmistructure.cctbxparset import CCTBXCrystalParSet
 
     if CCTBXCrystalParSet.canAdapt(stru):
         return CCTBXCrystalParSet(name, stru)
@@ -60,9 +69,7 @@ def struToParameterSet(name, stru):
     raise TypeError("Unadaptable structure format")
 
 
-# silence pyflakes checker
-assert constrain_as_space_group
-assert constrainAsSpaceGroup
-
+# silence the pyflakes syntax checker
+assert __version__ or True
 
 # End of file

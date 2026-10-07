@@ -25,7 +25,7 @@ from diffpy.utils._deprecator import build_deprecation_message, deprecated
 __all__ = ["constrain_as_space_group", "constrainAsSpaceGroup"]
 
 removal_version = "4.0.0"
-sgconstraints_base = "diffpy.srfit.structure.sgconstraints"
+sgconstraints_base = "diffpy.cmistructure.sgconstraints"
 
 constrainAsSpaceGroup_dep_msg = build_deprecation_message(
     sgconstraints_base,
@@ -146,7 +146,7 @@ def constrainAsSpaceGroup(
     4.0.0.
 
     Please use
-    diffpy.srfit.structure.sgconstraints.constrain_as_space_group
+    diffpy.cmistructure.sgconstraints.constrain_as_space_group
     instead.
     """
     return constrain_as_space_group(

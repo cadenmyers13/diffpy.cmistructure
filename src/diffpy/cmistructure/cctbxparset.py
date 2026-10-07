@@ -27,9 +27,9 @@ The following classes are adapted:
 - `CCTBXScattererParSet`: wrapper for `cctbx.xray.scatterer`.
 """
 
+from diffpy.cmistructure.basestructureparset import BaseStructureParSet
 from diffpy.srfit.fitbase.parameter import ParameterAdapter
 from diffpy.srfit.fitbase.parameterset import ParameterSet
-from diffpy.srfit.structure.basestructureparset import BaseStructureParSet
 
 __all__ = ["CCTBXScattererParSet", "CCTBXUnitCellParSet", "CCTBXCrystalParSet"]
 
@@ -253,7 +253,7 @@ class CCTBXCrystalParSet(BaseStructureParSet):
             self.scatterers.append(scatterer)
 
         # Constrain the lattice
-        from diffpy.srfit.structure.sgconstraints import _constrain_space_group
+        from diffpy.cmistructure.sgconstraints import _constrain_space_group
 
         symbol = self.getSpaceGroup()
         _constrain_space_group(self, symbol)

@@ -12,7 +12,7 @@
 # See LICENSE_DANSE.txt for license information.
 #
 ##############################################################################
-"""Tests for diffpy.srfit.structure package."""
+"""Tests for diffpy.cmistructure package."""
 
 import unittest
 
@@ -125,7 +125,7 @@ class TestParameterAdapter:
         from pyobjcryst.molecule import Molecule
         from pyobjcryst.scatteringpower import ScatteringPowerAtom
 
-        from diffpy.srfit.structure.objcrystparset import ObjCrystCrystalParSet
+        from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
 
         self.occryst = makeC60()
         self.ocmol = self.occryst.GetScatterer("c60")
@@ -634,7 +634,7 @@ class TestCreateSpaceGroup:
             pytest.skip("pyobjcryst package not available")
 
         global ObjCrystCrystalParSet, spacegroups
-        from diffpy.srfit.structure.objcrystparset import ObjCrystCrystalParSet
+        from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
         from diffpy.structure import spacegroups
 
     @staticmethod

@@ -12,14 +12,14 @@
 # See LICENSE_DANSE.txt for license information.
 #
 ##############################################################################
-"""Tests for diffpy.srfit.structure package."""
+"""Tests for diffpy.cmistructure package."""
 
 import pickle
 import unittest
 
 import numpy as np
 
-from diffpy.srfit.structure.diffpyparset import DiffpyStructureParSet
+from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
 
 
 def testDiffpyStructureParSet():

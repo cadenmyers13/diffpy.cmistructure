@@ -31,9 +31,9 @@ The following classes are adapted:
 
 __all__ = ["DiffpyStructureParSet"]
 
+from diffpy.cmistructure.srrealparset import SrRealParSet
 from diffpy.srfit.fitbase.parameter import ParameterAdapter, ParameterProxy
 from diffpy.srfit.fitbase.parameterset import ParameterSet
-from diffpy.srfit.structure.srrealparset import SrRealParSet
 from diffpy.srfit.util.argbinders import bind2nd
 
 

@@ -16,8 +16,8 @@
 
 __all__ = ["SrRealParSet"]
 
-from diffpy.srfit.structure.basestructureparset import BaseStructureParSet
-from diffpy.srfit.structure.bvsrestraint import BVSRestraint
+from diffpy.cmistructure.basestructureparset import BaseStructureParSet
+from diffpy.cmistructure.bvsrestraint import BVSRestraint
 
 
 class SrRealParSet(BaseStructureParSet):
