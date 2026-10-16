@@ -1,1 +1,5 @@
 numpy
+diffpy.srreal
+diffpy.srfit
+diffpy.structure
+pyobjcryst
