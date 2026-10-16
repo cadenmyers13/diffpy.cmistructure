@@ -171,7 +171,7 @@ class CCTBXUnitCellParSet(ParameterSet):
         """
         ParameterSet.__init__(self, "unitcell")
         self.structure_parameter_set = structure_parameter_set
-        self._lattice_parameters = list(
+        self._latpars = list(
             self.structure_parameter_set.structure.unit_cell().parameters()
         )
 
@@ -205,14 +205,14 @@ class CCTBXUnitCellParSet(ParameterSet):
     def _latgetter(self, i):
 
         def f(dummy):
-            return self._lattice_parameters[i]
+            return self._latpars[i]
 
         return f
 
     def _latsetter(self, i):
 
         def f(dummy, value):
-            self._lattice_parameters[i] = value
+            self._latpars[i] = value
             self.structure_parameter_set._update = True
             return
 
@@ -289,7 +289,7 @@ class CCTBXCrystalParSet(BaseStructureParSet):
         from cctbx.crystal import symmetry
 
         symm = symmetry(
-            unit_cell=self.unitcell._lattice_parameters, space_group_symbol=sgn
+            unit_cell=self.unitcell._latpars, space_group_symbol=sgn
         )
 
         # Now the new structure
@@ -297,9 +297,7 @@ class CCTBXCrystalParSet(BaseStructureParSet):
             crystal_symmetry=symm, scatterers=structure.scatterers()
         )
 
-        self.unitcell._lattice_parameters = list(
-            newstru.unit_cell().parameters()
-        )
+        self.unitcell._latpars = list(newstru.unit_cell().parameters())
 
         self.structure = newstru
         return

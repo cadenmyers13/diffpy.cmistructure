@@ -1824,7 +1824,7 @@ class ObjCrystCrystalParSet(SrRealParSet):
         The adapted crystal.
     scatterers : list of ObjCrystAtomParSet or ObjCrystMoleculeParSet
         The scatterer ParameterSets, provided for convenience.
-    space_group_parameters : SpaceGroupParameters
+    sgpars : SpaceGroupParameters
         The free structure Parameters after applying the crystal's space
         group constraints, created when first accessed. See the
         diffpy.cmistructure.sgconstraints module.
@@ -1857,7 +1857,7 @@ class ObjCrystCrystalParSet(SrRealParSet):
         SrRealParSet.__init__(self, name)
         self.angle_units = "rad"
         self.structure = crystal
-        self._space_group_parameters = None
+        self._sgpars = None
 
         self.add_parameter(ParameterAdapter("a", self.structure, attr="a"))
         self.add_parameter(ParameterAdapter("b", self.structure, attr="b"))
@@ -1902,8 +1902,8 @@ class ObjCrystCrystalParSet(SrRealParSet):
 
     def _constrain_space_group(self):
         """Constrain the space group."""
-        if self._space_group_parameters is not None:
-            return self._space_group_parameters
+        if self._sgpars is not None:
+            return self._sgpars
         space_group = self._create_space_group(self.structure.GetSpaceGroup())
         from diffpy.cmistructure.sgconstraints import (
             _constrain_as_space_group,
@@ -1912,7 +1912,7 @@ class ObjCrystCrystalParSet(SrRealParSet):
         adpsymbols = ["B11", "B22", "B33", "B12", "B13", "B23"]
         isosymbol = "Biso"
         sgoffset = [0, 0, 0]
-        self._space_group_parameters = _constrain_as_space_group(
+        self._sgpars = _constrain_as_space_group(
             self,
             space_group,
             self.scatterers,
@@ -1920,9 +1920,9 @@ class ObjCrystCrystalParSet(SrRealParSet):
             adpsymbols=adpsymbols,
             isosymbol=isosymbol,
         )
-        return self._space_group_parameters
+        return self._sgpars
 
-    space_group_parameters = property(_constrain_space_group)
+    sgpars = property(_constrain_space_group)
 
     @staticmethod
     def _create_space_group(sgobjcryst):

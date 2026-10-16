@@ -19,7 +19,6 @@
 """Tests for diffpy.cmistructure package."""
 
 import pickle
-import unittest
 
 import numpy as np
 
@@ -192,6 +191,3 @@ def test_show_bvs_restraint(capturestdout):
 
 
 # End of class TestParameterAdapter
-
-if __name__ == "__main__":
-    unittest.main()

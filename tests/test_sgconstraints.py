@@ -18,8 +18,6 @@
 ##############################################################################
 """Tests space group constraints."""
 
-import unittest
-
 import numpy
 import pytest
 
@@ -42,9 +40,9 @@ def test_ObjCryst_constrain_space_group():
     # Make sure we actually create the constraints
     structure._constrain_space_group()
     # Make the space group parameters individually
-    structure.space_group_parameters.lattice_parameters
-    structure.space_group_parameters.xyz_parameters
-    structure.space_group_parameters.adp_parameters
+    structure.sgpars.latpars
+    structure.sgpars.xyzpars
+    structure.sgpars.adppars
 
     # C1: The orthorhombic lattice of LaMnO3 in P b n m.
     # Expected: The angles are fixed at pi / 2, the lengths are free, and
@@ -249,6 +247,46 @@ def test_constrain_as_space_group_args(datafile):
     return
 
 
+# The space group containers keep diffpy.srfit's names, since user scripts
+# and parameter paths such as "sgpars.latpars.a" rely on them.
+@pytest.mark.parametrize(
+    "input_container_attribute, expected_container_name",
+    [
+        # C1: A container of free Parameters is read from the
+        # SpaceGroupParameters, 1. latpars, 2. xyzpars, 3. adppars.
+        # Expected: The container is named after the attribute it is read
+        # from.
+        ("latpars", "latpars"),
+        ("xyzpars", "xyzpars"),
+        ("adppars", "adppars"),
+    ],
+)
+def test_space_group_parameter_container_names(
+    datafile, input_container_attribute, expected_container_name
+):
+    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
+    from diffpy.cmistructure.sgconstraints import constrain_as_space_group
+
+    parameter_set = DiffpyStructureParSet("LaMnO3", makeLaMnO3_P1(datafile))
+    space_group_parameters = constrain_as_space_group(parameter_set, "P b n m")
+    container = getattr(space_group_parameters, input_container_attribute)
+    actual_container_name = container.name
+    assert actual_container_name == expected_container_name
+
+
+def test_objcryst_space_group_parameters_name():
+    # C1: The space group Parameters are read from an ObjCrystCrystalParSet.
+    # Expected: They are available as .sgpars, in a container named
+    # "sgpars".
+    from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
+
+    occryst = makeLaMnO3()
+    structure = ObjCrystCrystalParSet(occryst.GetName(), occryst)
+    actual_container_name = structure.sgpars.name
+    expected_container_name = "sgpars"
+    assert actual_container_name == expected_container_name
+
+
 def makeLaMnO3_P1(datafile):
     from diffpy.structure import Structure
 
@@ -295,6 +333,3 @@ def makeLaMnO3():
 
 
 # ----------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    unittest.main()

@@ -18,8 +18,6 @@
 ##############################################################################
 """Tests for diffpy.cmistructure package."""
 
-import unittest
-
 import numpy
 import pytest
 
@@ -855,6 +853,3 @@ class TestCreateSpaceGroup:
 
 
 # End of class TestCreateSpaceGroup
-
-if __name__ == "__main__":
-    unittest.main()
