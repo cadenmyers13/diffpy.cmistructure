@@ -1,30 +1,68 @@
 :tocdepth: -1
 
-|title|
-=======
-
-.. |title| replace:: diffpy.cmistructure package
+diffpy.cmistructure package
+===========================
 
 .. automodule:: diffpy.cmistructure
     :members:
     :undoc-members:
     :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-   diffpy.cmistructure.example_package
-
 Submodules
 ----------
 
-|module|
---------
+diffpy.cmistructure.objcrystparset module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. |module| replace:: diffpy.cmistructure.example_submodule module
+.. automodule:: diffpy.cmistructure.objcrystparset
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-.. automodule:: diffpy.cmistructure.example_submodule
+diffpy.cmistructure.basestructureparset module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: diffpy.cmistructure.basestructureparset
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+diffpy.cmistructure.srrealparset module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: diffpy.cmistructure.srrealparset
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+diffpy.cmistructure.diffpyparset module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: diffpy.cmistructure.diffpyparset
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+diffpy.cmistructure.cctbxparset module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: diffpy.cmistructure.cctbxparset
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+diffpy.cmistructure.bvsrestraint module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: diffpy.cmistructure.bvsrestraint
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+diffpy.cmistructure.sgconstraints module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: diffpy.cmistructure.sgconstraints
     :members:
     :undoc-members:
     :show-inheritance:
