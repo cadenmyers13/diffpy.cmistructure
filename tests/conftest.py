@@ -1,5 +1,7 @@
 import importlib.resources
+import io
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -29,3 +31,19 @@ def datafile():
         return importlib.resources.files("tests.testdata").joinpath(filename)
 
     return _datafile
+
+
+@pytest.fixture(scope="session")
+def capturestdout():
+    def _capturestdout(f, *args, **kwargs):
+        """Capture the standard output from a call of function f."""
+        savestdout = sys.stdout
+        fp = io.StringIO()
+        try:
+            sys.stdout = fp
+            f(*args, **kwargs)
+        finally:
+            sys.stdout = savestdout
+        return fp.getvalue()
+
+    return _capturestdout

@@ -374,15 +374,15 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
         # from within this class.
         for b in self.scatterer.GetBondList():
             restraint = ObjCrystMoleculeRestraint(b)
-            self._restraints.add(restraint)
+            self.register_soft_bounds(restraint)
 
         for ba in self.scatterer.GetBondAngleList():
             restraint = ObjCrystMoleculeRestraint(ba)
-            self._restraints.add(restraint)
+            self.register_soft_bounds(restraint)
 
         for da in self.scatterer.GetDihedralAngleList():
             restraint = ObjCrystMoleculeRestraint(da)
-            self._restraints.add(restraint)
+            self.register_soft_bounds(restraint)
 
         return
 
@@ -475,12 +475,12 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
         Returns
         -------
         ObjCrystBondLengthRestraint
-            The restraint, for use with the ``unrestrain`` method.
+            The restraint, for use with the ``remove_soft_bounds`` method.
         """
         restraint = ObjCrystBondLengthRestraint(
             atom1, atom2, length, sigma, delta, scaled
         )
-        self._restraints.add(restraint)
+        self.register_soft_bounds(restraint)
 
         return restraint
 
@@ -511,7 +511,7 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
         Returns
         -------
         ObjCrystBondLengthRestraint
-            The restraint, for use with the ``unrestrain`` method.
+            The restraint, for use with the ``remove_soft_bounds`` method.
         """
         return self.restrain_bond_length(
             parameter.atom1, parameter.atom2, length, sigma, delta, scaled
@@ -547,12 +547,12 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
         Returns
         -------
         ObjCrystBondAngleRestraint
-            The restraint, for use with the ``unrestrain`` method.
+            The restraint, for use with the ``remove_soft_bounds`` method.
         """
         restraint = ObjCrystBondAngleRestraint(
             atom1, atom2, atom3, angle, sigma, delta, scaled
         )
-        self._restraints.add(restraint)
+        self.register_soft_bounds(restraint)
 
         return restraint
 
@@ -583,7 +583,7 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
         Returns
         -------
         ObjCrystBondAngleRestraint
-            The restraint, for use with the ``unrestrain`` method.
+            The restraint, for use with the ``remove_soft_bounds`` method.
         """
         return self.restrain_bond_angle(
             parameter.atom1,
@@ -627,12 +627,12 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
         Returns
         -------
         ObjCrystDihedralAngleRestraint
-            The restraint, for use with the ``unrestrain`` method.
+            The restraint, for use with the ``remove_soft_bounds`` method.
         """
         restraint = ObjCrystDihedralAngleRestraint(
             atom1, atom2, atom3, atom4, angle, sigma, delta, scaled
         )
-        self._restraints.add(restraint)
+        self.register_soft_bounds(restraint)
 
         return restraint
 
@@ -663,7 +663,7 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
         Returns
         -------
         ObjCrystDihedralAngleRestraint
-            The restraint, for use with the ``unrestrain`` method.
+            The restraint, for use with the ``remove_soft_bounds`` method.
         """
         return self.restrain_dihedral_angle(
             parameter.atom1,
@@ -912,6 +912,26 @@ class ObjCrystMoleculeRestraint(object):
         self.restraint = restraint
         self.scaled = scaled
         return
+
+    def __str__(self):
+        """Return the restrained atoms with the restraint settings."""
+        restraint = self.restraint
+        if hasattr(restraint, "GetLength0"):
+            target = (
+                f"length = {restraint.GetLength0():f}, "
+                f"sigma = {restraint.GetLengthSigma():f}, "
+                f"delta = {restraint.GetLengthDelta():f}"
+            )
+        else:
+            target = (
+                f"angle = {restraint.GetAngle0():f}, "
+                f"sigma = {restraint.GetAngleSigma():f}, "
+                f"delta = {restraint.GetAngleDelta():f}"
+            )
+        restraint_str = (
+            f"{restraint.GetName()}: {target}, scaled = {self.scaled}"
+        )
+        return restraint_str
 
     def penalty(self, w=1.0):
         """Calculate the penalty of the restraint.
@@ -1278,9 +1298,9 @@ class StretchModeParameter(Parameter):
         self.mutated_atoms.update(atomlist)
         # Make sure we're observing these atoms
         for a in atomlist:
-            a.x.addObserver(self._flush)
-            a.y.addObserver(self._flush)
-            a.z.addObserver(self._flush)
+            a.x.add_observer(self._flush)
+            a.y.add_observer(self._flush)
+            a.z.add_observer(self._flush)
 
         # Record the added atoms in the StretchMode
         scatlist = [a.scatterer for a in atomlist]
@@ -1406,9 +1426,9 @@ class ObjCrystBondLengthParameter(StretchModeParameter):
 
         # Observe the atom positions
         for a in [atom1, atom2]:
-            a.x.addObserver(self._flush)
-            a.y.addObserver(self._flush)
-            a.z.addObserver(self._flush)
+            a.x.add_observer(self._flush)
+            a.y.add_observer(self._flush)
+            a.z.add_observer(self._flush)
 
         self.atom1 = atom1
         self.atom2 = atom2
@@ -1551,9 +1571,9 @@ class ObjCrystBondAngleParameter(StretchModeParameter):
 
         # Observe the atom positions
         for a in [atom1, atom2, atom3]:
-            a.x.addObserver(self._flush)
-            a.y.addObserver(self._flush)
-            a.z.addObserver(self._flush)
+            a.x.add_observer(self._flush)
+            a.y.add_observer(self._flush)
+            a.z.add_observer(self._flush)
 
         self.atom1 = atom1
         self.atom2 = atom2
@@ -1714,9 +1734,9 @@ class ObjCrystDihedralAngleParameter(StretchModeParameter):
 
         # Observe the atom positions
         for a in [atom1, atom2, atom3, atom4]:
-            a.x.addObserver(self._flush)
-            a.y.addObserver(self._flush)
-            a.z.addObserver(self._flush)
+            a.x.add_observer(self._flush)
+            a.y.add_observer(self._flush)
+            a.z.add_observer(self._flush)
 
         self.atom1 = atom1
         self.atom2 = atom2

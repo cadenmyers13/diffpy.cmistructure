@@ -389,6 +389,59 @@ class TestParameterAdapter:
 
         return
 
+    def test_show_explicit_molecule_restraints(self, capturestdout):
+        # C1: A bond length, a bond angle and a dihedral angle restraint are
+        # added through the ObjCrystMoleculeParSet.
+        # Expected: The Restraints section lists each restraint by its atom
+        # names with its target value, sigma, delta and scaling.
+        crystal = ObjCrystCrystalParSet("bucky", self.occryst)
+        molecule = crystal.c60
+        atoms = molecule.atoms
+        molecule.restrain_bond_length(atoms[0], atoms[5], 3.3, 0.1, 0.2)
+        molecule.restrain_bond_angle(
+            atoms[0], atoms[5], atoms[7], 1.0, 0.1, 0.2
+        )
+        molecule.restrain_dihedral_angle(
+            atoms[0], atoms[5], atoms[7], atoms[8], 2.0, 0.1, 0.2
+        )
+        lines = capturestdout(crystal.show, textwidth=0).splitlines()
+        actual_restraint_lines = set(lines[lines.index("Restraints") + 2 :])
+        expected_restraint_lines = {
+            "C0-C5: length = 3.300000, sigma = 0.100000, delta = 0.200000, "
+            "scaled = False",
+            "C0-C5-C7: angle = 1.000000, sigma = 0.100000, delta = 0.200000, "
+            "scaled = False",
+            "C0-C5-C7-C8: angle = 2.000000, sigma = 0.100000, "
+            "delta = 0.200000, scaled = False",
+        }
+        assert actual_restraint_lines == expected_restraint_lines
+
+    def test_show_implicit_molecule_restraints(self, capturestdout):
+        # C1: A bond length, a bond angle and a dihedral angle restraint are
+        # defined on the pyobjcryst Molecule and wrapped with
+        # wrap_restraints.
+        # Expected: The Restraints section lists each restraint by its atom
+        # names with its target value, sigma, delta and scaling.
+        ocmol = self.ocmol
+        ocmol.AddBond(ocmol[0], ocmol[5], 3.3, 0.1, 0.2)
+        ocmol.AddBondAngle(ocmol[0], ocmol[5], ocmol[7], 1.0, 0.1, 0.2)
+        ocmol.AddDihedralAngle(
+            ocmol[0], ocmol[5], ocmol[7], ocmol[8], 2.0, 0.1, 0.2
+        )
+        crystal = ObjCrystCrystalParSet("bucky", self.occryst)
+        crystal.c60.wrap_restraints()
+        lines = capturestdout(crystal.show, textwidth=0).splitlines()
+        actual_restraint_lines = set(lines[lines.index("Restraints") + 2 :])
+        expected_restraint_lines = {
+            "C0-C5: length = 3.300000, sigma = 0.100000, delta = 0.200000, "
+            "scaled = False",
+            "C0-C5-C7: angle = 1.000000, sigma = 0.100000, delta = 0.200000, "
+            "scaled = False",
+            "C0-C5-C7-C8: angle = 2.000000, sigma = 0.100000, "
+            "delta = 0.200000, scaled = False",
+        }
+        assert actual_restraint_lines == expected_restraint_lines
+
     def testExplicitBondAngleRestraints(self):
         """Test the structure with explicit bond angles.
 

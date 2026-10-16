@@ -172,6 +172,25 @@ def test_pickling():
     return
 
 
+def test_show_bvs_restraint(capturestdout):
+    # C1: A scaled BVS restraint with sig = 0.5 is added to the structure
+    # nacl.
+    # Expected: The Restraints section lists it as the BVS of nacl with its
+    # sig and scaling.
+    from diffpy.structure import Atom, Lattice, Structure
+
+    lattice = Lattice(5.6, 5.6, 5.6, 90, 90, 90)
+    atoms = [Atom("Na", [0, 0, 0]), Atom("Cl", [0.5, 0.5, 0.5])]
+    parameter_set = DiffpyStructureParSet(
+        "nacl", Structure(atoms, lattice=lattice)
+    )
+    parameter_set.restrain_bvs(sig=0.5, scaled=True)
+    lines = capturestdout(parameter_set.show).splitlines()
+    actual_restraint_lines = lines[lines.index("Restraints") + 2 :]
+    expected_restraint_lines = ["BVS of nacl: sig = 0.500000, scaled = True"]
+    assert actual_restraint_lines == expected_restraint_lines
+
+
 # End of class TestParameterAdapter
 
 if __name__ == "__main__":
