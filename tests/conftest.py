@@ -6,6 +6,9 @@ from pathlib import Path
 
 import pytest
 
+from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
+from diffpy.structure import Structure
+
 
 @pytest.fixture
 def user_filesystem(tmp_path):
@@ -47,3 +50,20 @@ def capturestdout():
         return fp.getvalue()
 
     return _capturestdout
+
+
+class GeneratorStandIn:
+    """Stand in for a generator, such as a PDFGenerator, that holds a
+    structure parameter set as ``.phase``."""
+
+    def __init__(self, phase):
+        self.phase = phase
+
+
+@pytest.fixture
+def lamno3_generator(datafile):
+    structure = Structure()
+    structure.read(datafile("LaMnO3.stru"))
+    parameter_set = DiffpyStructureParSet("LaMnO3", structure)
+    generator = GeneratorStandIn(parameter_set)
+    return generator

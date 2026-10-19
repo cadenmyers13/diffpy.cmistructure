@@ -18,8 +18,20 @@
 ##############################################################################
 """Tests space group constraints."""
 
+import re
+
 import numpy
 import pytest
+from pyobjcryst.atom import Atom
+from pyobjcryst.crystal import Crystal
+from pyobjcryst.scatteringpower import ScatteringPowerAtom
+
+from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
+from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
+from diffpy.cmistructure.sgconstraints import constrain_as_space_group
+from diffpy.srfit.fitbase.fitrecipe import FitRecipe
+from diffpy.structure import Structure
+from diffpy.structure.spacegroups import get_space_group
 
 # ----------------------------------------------------------------------------
 
@@ -31,8 +43,6 @@ def test_ObjCryst_constrain_space_group():
     diffpy.cmistructure.sgconstraints, which is performed automatically
     when an ObjCrystCrystalParSet is created.
     """
-    from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
-
     pi = numpy.pi
 
     occryst = makeLaMnO3()
@@ -106,7 +116,6 @@ def test_ObjCryst_constrain_space_group():
         mn.add_constraint(mn.z, "x")
 
     # Nor can we make them into variables
-    from diffpy.srfit.fitbase.fitrecipe import FitRecipe
 
     f = FitRecipe()
     with pytest.raises(ValueError):
@@ -117,9 +126,6 @@ def test_ObjCryst_constrain_space_group():
 
 def test_DiffPy_constrain_as_space_group(datafile):
     """Test the constrain_as_space_group function."""
-    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
-    from diffpy.cmistructure.sgconstraints import constrain_as_space_group
-
     structure = makeLaMnO3_P1(datafile)
     parameter_set = DiffpyStructureParSet("LaMnO3", structure)
 
@@ -223,10 +229,6 @@ def test_DiffPy_constrain_as_space_group(datafile):
 def test_constrain_as_space_group_args(datafile):
     """Test the arguments processing of constrain_as_space_group
     function."""
-    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
-    from diffpy.cmistructure.sgconstraints import constrain_as_space_group
-    from diffpy.structure.spacegroups import get_space_group
-
     # C1: The space group is given as a symbol or as a SpaceGroup object.
     # Expected: Both create the same space group Parameters.
     structure = makeLaMnO3_P1(datafile)
@@ -247,6 +249,50 @@ def test_constrain_as_space_group_args(datafile):
     return
 
 
+def test_constrain_as_space_group_generator(lamno3_generator):
+    # Test that constrain_as_space_group accepts a generator in place of
+    # its structure parameter set.
+    # C1: A generator holding the P1 LaMnO3 parameter set as .phase is
+    # constrained to the orthorhombic space group P b n m.
+    # Expected: Only the lattice lengths a, b and c of its .phase are left
+    # free.
+    space_group_parameters = constrain_as_space_group(
+        lamno3_generator, "P b n m"
+    )
+    actual_free_lattice_names = [
+        parameter.name for parameter in space_group_parameters.latpars
+    ]
+    expected_free_lattice_names = ["a", "b", "c"]
+    assert actual_free_lattice_names == expected_free_lattice_names
+
+
+@pytest.mark.parametrize(
+    "input_phase, expected_type_name",
+    [
+        # Test that constrain_as_space_group rejects objects that are
+        # neither a structure parameter set nor a generator holding one.
+        # C1: A diffpy.structure Structure is passed instead of its
+        # parameter set.
+        # Expected: A TypeError names the Structure type and explains what
+        # to pass instead.
+        (Structure(), "Structure"),
+        # C2: A file name is passed instead of a parameter set.
+        # Expected: A TypeError names the str type and explains what to
+        # pass instead.
+        ("LaMnO3.stru", "str"),
+    ],
+)
+def test_constrain_as_space_group_bad_phase(input_phase, expected_type_name):
+
+    expected_msg = (
+        "Expected a structure parameter set or a generator with a .phase "
+        f"attribute, got {expected_type_name}. "
+        "Please pass generator.phase or the generator itself."
+    )
+    with pytest.raises(TypeError, match=re.escape(expected_msg)):
+        constrain_as_space_group(input_phase, "P b n m")
+
+
 # The space group containers keep diffpy.srfit's names, since user scripts
 # and parameter paths such as "sgpars.latpars.a" rely on them.
 @pytest.mark.parametrize(
@@ -264,8 +310,6 @@ def test_constrain_as_space_group_args(datafile):
 def test_space_group_parameter_container_names(
     datafile, input_container_attribute, expected_container_name
 ):
-    from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
-    from diffpy.cmistructure.sgconstraints import constrain_as_space_group
 
     parameter_set = DiffpyStructureParSet("LaMnO3", makeLaMnO3_P1(datafile))
     space_group_parameters = constrain_as_space_group(parameter_set, "P b n m")
@@ -278,7 +322,6 @@ def test_objcryst_space_group_parameters_name():
     # C1: The space group Parameters are read from an ObjCrystCrystalParSet.
     # Expected: They are available as .sgpars, in a container named
     # "sgpars".
-    from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
 
     occryst = makeLaMnO3()
     structure = ObjCrystCrystalParSet(occryst.GetName(), occryst)
@@ -288,7 +331,6 @@ def test_objcryst_space_group_parameters_name():
 
 
 def makeLaMnO3_P1(datafile):
-    from diffpy.structure import Structure
 
     structure = Structure()
     structure.read(datafile("LaMnO3.stru"))
@@ -296,9 +338,6 @@ def makeLaMnO3_P1(datafile):
 
 
 def makeLaMnO3():
-    from pyobjcryst.atom import Atom
-    from pyobjcryst.crystal import Crystal
-    from pyobjcryst.scatteringpower import ScatteringPowerAtom
 
     pi = numpy.pi
     # It appears that ObjCryst only supports standard symbols
