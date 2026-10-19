@@ -22,6 +22,7 @@ import re
 
 import numpy
 
+from diffpy.cmistructure.basestructureparset import BaseStructureParSet
 from diffpy.srfit.fitbase.parameter import ParameterProxy
 from diffpy.srfit.fitbase.recipeorganizer import RecipeContainer
 
@@ -51,8 +52,9 @@ def constrain_as_space_group(
 
     Parameters
     ----------
-    phase : BaseStructureParSet
-        The structure ParameterSet to constrain.
+    phase : BaseStructureParSet or object with a .phase attribute
+        The structure ParameterSet to constrain, or a generator such as a
+        PDFGenerator whose ``.phase`` is the structure ParameterSet.
     spacegroup : int, str or diffpy.structure.spacegroups.SpaceGroup
         The space group number, symbol or SpaceGroup instance.
     scatterers : list of ParameterSet, optional
@@ -102,9 +104,16 @@ def constrain_as_space_group(
     Cubic
         b and c are constrained to a, and alpha, beta and gamma are fixed
         to 90.
+
+    Raises
+    ------
+    TypeError
+        If ``phase`` is neither a structure ParameterSet nor an object
+        whose ``.phase`` is one.
     """
     from diffpy.structure.spacegroups import SpaceGroup, get_space_group
 
+    phase = _get_structure_parameter_set(phase)
     space_group = spacegroup
     if not isinstance(spacegroup, SpaceGroup):
         space_group = get_space_group(spacegroup)
@@ -134,10 +143,9 @@ def _constrain_as_space_group(
 ):
     """Restricted interface to constrain_as_space_group.
 
-    Arguments: As constrain_as_space_group, except
-    -----------------------------------------------
-    sg
-        diffpy.structure.spacegroups.SpaceGroup instance
+    The arguments are as for constrain_as_space_group, except that
+    ``phase`` must be a structure ParameterSet and ``space_group`` must
+    be a diffpy.structure.spacegroups.SpaceGroup instance.
     """
     from diffpy.structure.symmetryutilities import stdUsymbols
 
@@ -158,6 +166,19 @@ def _constrain_as_space_group(
     )
 
     return sgp
+
+
+def _get_structure_parameter_set(phase):
+    if isinstance(phase, BaseStructureParSet):
+        return phase
+    generator_phase = getattr(phase, "phase", None)
+    if isinstance(generator_phase, BaseStructureParSet):
+        return generator_phase
+    raise TypeError(
+        "Expected a structure parameter set or a generator with a .phase "
+        f"attribute, got {type(phase).__name__}. "
+        "Please pass generator.phase or the generator itself."
+    )
 
 
 # End constrain_as_space_group
@@ -769,21 +790,21 @@ def _makeconstraint(parname, formula, scatterer, index, ns={}):
 
     Parameters
     ----------
-    parname
-        Name of parameter
-    formula
-        Constraint formula
-    scatterer
-        scatterer containing par of parname
-    idx
-        Index to identify scatterer from which par comes
-    ns
-        namespace to draw extra names from (default {})
+    parname : str
+        The name of the Parameter.
+    formula : str
+        The constraint formula.
+    scatterer : ParameterSet
+        The scatterer containing the Parameter named ``parname``.
+    index : int
+        The index that identifies the scatterer the Parameter comes from.
+    ns : dict, optional
+        The namespace to draw extra names from (default {}).
 
     Returns
     -------
-    par
-        Returns the parameter if it is free.
+    Parameter or None
+        The Parameter if it is free, otherwise None.
     """
     parameter = scatterer.get(parname)
 

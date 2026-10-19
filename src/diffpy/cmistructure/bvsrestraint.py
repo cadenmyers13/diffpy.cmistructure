@@ -106,9 +106,12 @@ class BVSRestraint(Restraint):
         return penalty
 
     def _validate(self):
-        """This evaluates the calculator.
+        """Evaluate the calculator to check that it is valid.
 
-        Raises SrFitError if validation fails.
+        Raises
+        ------
+        SrFitError
+            If the penalty cannot be computed.
         """
         from numpy import nan
 
