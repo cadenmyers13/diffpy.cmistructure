@@ -11,8 +11,5 @@ jobs:
       project: diffpy.cmistructure
       c_extension: false
       headless: false
-      run: |
-        set -Eeuo pipefail
-        python -m pip install --no-deps diffpy.srfit==3.4.0rc0
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
