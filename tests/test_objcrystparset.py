@@ -248,10 +248,32 @@ def test_implicit_dihedral_angle_restraints(c60_crystal, c60_molecule):
     return
 
 
-def test_implicit_stretch_modes():
-    """Test the molecule with implicit stretch modes."""
-    # Not sure how to make this happen.
-    pass
+def test_wrap_stretch_mode_parameters(c60_crystal, c60_molecule):
+    # Case: The molecule has two bond lengths and one bond angle in the
+    # chain C0-C1-C2, and its stretch modes are built.
+    # Expected: Each bond length and bond angle stretch mode is wrapped
+    # as a Parameter named after its atoms. pyobjcryst builds one mode
+    # for each side of a bond or angle, so every name appears in both
+    # atom orders.
+    ocmol = c60_molecule
+    ocmol.AddBond(ocmol[0], ocmol[1], 1.37, 0.1, 0.1)
+    ocmol.AddBond(ocmol[1], ocmol[2], 6.9, 0.1, 0.1)
+    ocmol.AddBondAngle(ocmol[0], ocmol[1], ocmol[2], 1.57, 0.1, 0.1)
+    ocmol.BuildStretchModeBondLength()
+    ocmol.BuildStretchModeBondAngle()
+    molecule = ObjCrystCrystalParSet("bucky", c60_crystal).c60
+    parameter_names_before = set(molecule._parameters)
+    molecule.wrap_stretch_mode_parameters()
+    actual_names = sorted(set(molecule._parameters) - parameter_names_before)
+    expected_names = [
+        "ba_C0_C1_C2",
+        "ba_C2_C1_C0",
+        "bl_C0_C1",
+        "bl_C1_C0",
+        "bl_C1_C2",
+        "bl_C2_C1",
+    ]
+    assert actual_names == expected_names
 
 
 def test_explicit_bond_length_restraints(c60_crystal, c60_molecule):

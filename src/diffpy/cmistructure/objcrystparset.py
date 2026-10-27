@@ -418,7 +418,7 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
                 name = a.GetName()
                 atoms.append(getattr(self, name))
 
-            parameter.AddAtoms(atoms)
+            parameter.add_atoms(atoms)
 
             self.add_parameter(parameter)
 
@@ -441,7 +441,7 @@ class ObjCrystMoleculeParSet(ObjCrystScattererParSet):
             for a in mode.GetAtoms():
                 name = a.GetName()
                 atoms.append(getattr(self, name))
-            parameter.AddAtoms(atoms)
+            parameter.add_atoms(atoms)
 
             self.add_parameter(parameter)
 
