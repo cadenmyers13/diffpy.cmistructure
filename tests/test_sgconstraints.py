@@ -22,9 +22,6 @@ import re
 
 import numpy
 import pytest
-from pyobjcryst.atom import Atom
-from pyobjcryst.crystal import Crystal
-from pyobjcryst.scatteringpower import ScatteringPowerAtom
 
 from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
 from diffpy.cmistructure.objcrystparset import ObjCrystCrystalParSet
@@ -36,7 +33,7 @@ from diffpy.structure.spacegroups import get_space_group
 # ----------------------------------------------------------------------------
 
 
-def test_ObjCryst_constrain_space_group():
+def test_objcryst_constrain_space_group(lamno3_crystal):
     """Make sure that all Parameters are constrained properly.
 
     This tests constrainSpaceGroup from
@@ -45,7 +42,7 @@ def test_ObjCryst_constrain_space_group():
     """
     pi = numpy.pi
 
-    occryst = makeLaMnO3()
+    occryst = lamno3_crystal
     structure = ObjCrystCrystalParSet(occryst.GetName(), occryst)
     # Make sure we actually create the constraints
     structure._constrain_space_group()
@@ -124,9 +121,9 @@ def test_ObjCryst_constrain_space_group():
     return
 
 
-def test_DiffPy_constrain_as_space_group(datafile):
+def test_diffpy_constrain_as_space_group(lamno3_p1_structure):
     """Test the constrain_as_space_group function."""
-    structure = makeLaMnO3_P1(datafile)
+    structure = lamno3_p1_structure
     parameter_set = DiffpyStructureParSet("LaMnO3", structure)
 
     space_group_parameters = constrain_as_space_group(
@@ -226,17 +223,17 @@ def test_DiffPy_constrain_as_space_group(datafile):
     return
 
 
-def test_constrain_as_space_group_args(datafile):
+def test_constrain_as_space_group_args(lamno3_p1_structure):
     """Test the arguments processing of constrain_as_space_group
     function."""
     # C1: The space group is given as a symbol or as a SpaceGroup object.
     # Expected: Both create the same space group Parameters.
-    structure = makeLaMnO3_P1(datafile)
+    structure = lamno3_p1_structure
     parameter_set = DiffpyStructureParSet("LaMnO3", structure)
     symbol_parameters = constrain_as_space_group(parameter_set, "P b n m")
     space_group = get_space_group("P b n m")
     object_parameter_set = DiffpyStructureParSet(
-        "LMO", makeLaMnO3_P1(datafile)
+        "LMO", lamno3_p1_structure.copy()
     )
     object_parameters = constrain_as_space_group(
         object_parameter_set, space_group
@@ -283,7 +280,6 @@ def test_constrain_as_space_group_generator(lamno3_generator):
     ],
 )
 def test_constrain_as_space_group_bad_phase(input_phase, expected_type_name):
-
     expected_msg = (
         "Expected a structure parameter set or a generator with a .phase "
         f"attribute, got {expected_type_name}. "
@@ -308,67 +304,24 @@ def test_constrain_as_space_group_bad_phase(input_phase, expected_type_name):
     ],
 )
 def test_space_group_parameter_container_names(
-    datafile, input_container_attribute, expected_container_name
+    lamno3_p1_structure, input_container_attribute, expected_container_name
 ):
-
-    parameter_set = DiffpyStructureParSet("LaMnO3", makeLaMnO3_P1(datafile))
+    parameter_set = DiffpyStructureParSet("LaMnO3", lamno3_p1_structure)
     space_group_parameters = constrain_as_space_group(parameter_set, "P b n m")
     container = getattr(space_group_parameters, input_container_attribute)
     actual_container_name = container.name
     assert actual_container_name == expected_container_name
 
 
-def test_objcryst_space_group_parameters_name():
+def test_objcryst_space_group_parameters_name(lamno3_crystal):
     # C1: The space group Parameters are read from an ObjCrystCrystalParSet.
     # Expected: They are available as .sgpars, in a container named
     # "sgpars".
-
-    occryst = makeLaMnO3()
+    occryst = lamno3_crystal
     structure = ObjCrystCrystalParSet(occryst.GetName(), occryst)
     actual_container_name = structure.sgpars.name
     expected_container_name = "sgpars"
     assert actual_container_name == expected_container_name
-
-
-def makeLaMnO3_P1(datafile):
-
-    structure = Structure()
-    structure.read(datafile("LaMnO3.stru"))
-    return structure
-
-
-def makeLaMnO3():
-
-    pi = numpy.pi
-    # It appears that ObjCryst only supports standard symbols
-    crystal = Crystal(5.486341, 5.619215, 7.628206, "P b n m")
-    crystal.SetName("LaMnO3")
-    # La1
-    sp = ScatteringPowerAtom("La1", "La")
-    sp.SetBiso(8 * pi * pi * 0.003)
-    atom = Atom(0.996096, 0.0321494, 0.25, "La1", sp)
-    crystal.AddScatteringPower(sp)
-    crystal.AddScatterer(atom)
-    # Mn1
-    sp = ScatteringPowerAtom("Mn1", "Mn")
-    sp.SetBiso(8 * pi * pi * 0.003)
-    atom = Atom(0, 0.5, 0, "Mn1", sp)
-    crystal.AddScatteringPower(sp)
-    crystal.AddScatterer(atom)
-    # O1
-    sp = ScatteringPowerAtom("O1", "O")
-    sp.SetBiso(8 * pi * pi * 0.003)
-    atom = Atom(0.0595746, 0.496164, 0.25, "O1", sp)
-    crystal.AddScatteringPower(sp)
-    crystal.AddScatterer(atom)
-    # O2
-    sp = ScatteringPowerAtom("O2", "O")
-    sp.SetBiso(8 * pi * pi * 0.003)
-    atom = Atom(0.720052, 0.289387, 0.0311126, "O2", sp)
-    crystal.AddScatteringPower(sp)
-    crystal.AddScatterer(atom)
-
-    return crystal
 
 
 # ----------------------------------------------------------------------------

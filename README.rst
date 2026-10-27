@@ -38,7 +38,16 @@
 
 diffpy.cmi package for doing refinements with structure objects
 
-* LONGER DESCRIPTION HERE
+``diffpy.cmistructure`` adapts crystal and molecular structures to the
+``diffpy.srfit`` ParameterSet interface, so lattice parameters, atom positions
+and displacement parameters can be refined. It supports
+``diffpy.structure.Structure``, ``pyobjcryst`` crystals and molecules, and
+``cctbx`` crystals. It also generates space group constraints and bond valence
+sum restraints.
+
+This code was moved from ``diffpy.srfit.structure``. If you are updating a
+script, see the `migration guide
+<https://diffpy.github.io/diffpy.cmistructure/migrating-from-srfit.html>`_.
 
 For more information about the diffpy.cmistructure library, please consult our `online documentation <https://diffpy.github.io/diffpy.cmistructure>`_.
 
@@ -82,7 +91,7 @@ and run the following ::
 
 This package also provides command-line utilities. To check the software has been installed correctly, type ::
 
-        diffpy.cmistructure --version
+        diffpy-cmistructure --version
 
 You can also type the following command to verify the installation. ::
 
@@ -91,7 +100,7 @@ You can also type the following command to verify the installation. ::
 
 To view the basic usage and available commands, type ::
 
-        diffpy.cmistructure -h
+        diffpy-cmistructure -h
 
 Getting Started
 ---------------

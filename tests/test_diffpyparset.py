@@ -23,12 +23,11 @@ import pickle
 import numpy as np
 
 from diffpy.cmistructure.diffpyparset import DiffpyStructureParSet
+from diffpy.structure import Atom, Lattice, Structure
 
 
-def testDiffpyStructureParSet():
+def test_diffpy_structure_parset():
     """Test the structure conversion."""
-    from diffpy.structure import Atom, Lattice, Structure
-
     a1 = Atom("Cu", xyz=np.array([0.0, 0.1, 0.2]), Uisoequiv=0.003)
     a2 = Atom("Ag", xyz=np.array([0.3, 0.4, 0.5]), Uisoequiv=0.002)
     lattice = Lattice(2.5, 2.5, 2.5, 90, 90, 90)
@@ -138,8 +137,6 @@ def testDiffpyStructureParSet():
 
 def test___repr__():
     """Test representation of DiffpyStructureParSet objects."""
-    from diffpy.structure import Atom, Lattice, Structure
-
     lat = Lattice(3, 3, 2, 90, 90, 90)
     atom = Atom("C", [0, 0.2, 0.5])
     structure = Structure([atom], lattice=lat)
@@ -154,8 +151,6 @@ def test___repr__():
 
 def test_pickling():
     """Test pickling of DiffpyStructureParSet."""
-    from diffpy.structure import Atom, Structure
-
     structure = Structure([Atom("C", [0, 0.2, 0.5])])
     dsps = DiffpyStructureParSet("dsps", structure)
     data = pickle.dumps(dsps)
@@ -176,8 +171,6 @@ def test_show_bvs_restraint(capturestdout):
     # nacl.
     # Expected: The Restraints section lists it as the BVS of nacl with its
     # sig and scaling.
-    from diffpy.structure import Atom, Lattice, Structure
-
     lattice = Lattice(5.6, 5.6, 5.6, 90, 90, 90)
     atoms = [Atom("Na", [0, 0, 0]), Atom("Cl", [0.5, 0.5, 0.5])]
     parameter_set = DiffpyStructureParSet(
@@ -188,6 +181,3 @@ def test_show_bvs_restraint(capturestdout):
     actual_restraint_lines = lines[lines.index("Restraints") + 2 :]
     expected_restraint_lines = ["BVS of nacl: sig = 0.500000, scaled = True"]
     assert actual_restraint_lines == expected_restraint_lines
-
-
-# End of class TestParameterAdapter
